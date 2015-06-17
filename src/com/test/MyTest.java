@@ -94,6 +94,7 @@ public class MyTest extends JFrame {
 		panel_noth.add(textField);
 		textField.setColumns(30);
 		
+		
 		JButton btnNewButton = new JButton("search");
 		panel_noth.add(btnNewButton);
 		
