@@ -32,6 +32,7 @@ public class LinkLabel extends JLabel{
         } catch (MalformedURLException err) {
             err.printStackTrace();
         }
+        
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseExited(MouseEvent e) {
