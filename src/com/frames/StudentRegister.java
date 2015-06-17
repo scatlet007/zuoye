@@ -28,6 +28,7 @@ public class StudentRegister extends JFrame {
 
 	public StudentRegister(){
 		init();
+		System.out.println("jjjjjj");
 	}
 	
 	public void init(){

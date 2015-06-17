@@ -63,5 +63,5 @@ public class LinkLabel extends JLabel{
             }
         });
     }
-
+    
 }
