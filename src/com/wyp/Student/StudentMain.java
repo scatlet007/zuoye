@@ -14,6 +14,9 @@ import javax.swing.JComboBox;
 import javax.swing.JButton;
 
 import com.frames.MFixedColumnTable;
+import java.awt.GridLayout;
+import javax.swing.JLabel;
+import javax.swing.border.EtchedBorder;
 
 public class StudentMain extends JFrame {
 
@@ -134,6 +137,31 @@ public class StudentMain extends JFrame {
 				mainData.setBorder(new EmptyBorder(20, 20, 20, 20));
 				contentPane.add(mainData, BorderLayout.CENTER);		//把面板添加到窗体中央
 				//复制 end
+				JPanel footBar = new JPanel();
+				footBar.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
+				contentPane.add(footBar, BorderLayout.SOUTH);
+				footBar.setLayout(new GridLayout(1, 6));
+				
+				JLabel systemBar = new JLabel("New label");
+				systemBar.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
+				footBar.add(systemBar);
+				
+				JLabel welcomeBar = new JLabel("welcome");
+				welcomeBar.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
+				footBar.add(welcomeBar);
+				
+				JLabel ctrler = new JLabel("\u64CD\u4F5C\u5458:");
+				ctrler.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
+				footBar.add(ctrler);
+				
+				JLabel data = new JLabel("\u65E5\u671F\uFF1A");
+				data.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
+				footBar.add(data);
+				
+				JLabel time = new JLabel("\u65F6\u95F4\uFF1A");
+				time.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
+				footBar.add(time);
+				
 	}
 
 }
