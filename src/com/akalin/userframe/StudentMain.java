@@ -9,21 +9,32 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+
 import java.awt.FlowLayout;
+
 import javax.swing.JComboBox;
 import javax.swing.JButton;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JScrollBar;
 import javax.swing.JLabel;
+
 import java.awt.GridLayout;
+
 import javax.swing.border.EtchedBorder;
+import javax.swing.table.DefaultTableModel;
 
 public class StudentMain extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4461864905127875923L;
 	private JPanel contentPane;
+	private DefaultTableModel tableModel;
 	private JTable table;
 
 	/**
@@ -47,7 +58,8 @@ public class StudentMain extends JFrame {
 	 */
 	public StudentMain() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100,650, 400);
+		setBounds(100, 100,675, 450);
+		this.setLocationRelativeTo(null);//窗口在屏幕中间显示
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
@@ -119,10 +131,14 @@ public class StudentMain extends JFrame {
 		contentPane.add(scrollPane, BorderLayout.CENTER);
 		
 		String[] columnValues={"序号","课程","学分","课程分类","考核方式","课程性质","成绩","取得学分","绩点","学分绩点"};
-		String[][] tableValues={{"1","2","3","4","5","6","7","8","9","10"},{"1","2","3","4","5","6","7","8","9","10"}};
-		table = new JTable(tableValues,columnValues);
-		table.setCellSelectionEnabled(true);
-		table.setFillsViewportHeight(true);
+		String[][] tableValues=new String[20][10];
+		for(int i=0;i<20;i++){
+			for(int j=0;j<10;j++){
+				tableValues[i][j]="+";
+			}
+		}
+		tableModel=new DefaultTableModel(tableValues, columnValues);
+		table = new JTable(tableModel);
 		scrollPane.setViewportView(table);
 		
 		JPanel footPanel = new JPanel();
@@ -133,7 +149,7 @@ public class StudentMain extends JFrame {
 		footPanel.add(panel, BorderLayout.NORTH);
 		panel.setLayout(new GridLayout(1, 4));
 		
-		JLabel lblNewLabel = new JLabel("    ");
+		JLabel lblNewLabel = new JLabel("");
 		panel.add(lblNewLabel);
 		
 		JLabel nowCredit = new JLabel("目前获得的学分：");

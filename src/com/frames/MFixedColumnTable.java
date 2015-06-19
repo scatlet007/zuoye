@@ -1,9 +1,7 @@
 package com.frames;
 
-import java.awt.BorderLayout;
 import java.util.Vector;
 
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JViewport;
@@ -12,7 +10,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
-public class MFixedColumnTable extends JPanel {
+public class MFixedColumnTable extends javax.swing.JPanel {
 	private static final long serialVersionUID = 5766917135088138415L;
 	private Vector<String> columnNameV;			//表格列名数组
 	private Vector<Vector<Object>> tableValueV;	//表格的数据数组
@@ -118,7 +116,7 @@ public class MFixedColumnTable extends JPanel {
 	 */
 	public MFixedColumnTable(Vector columnNameV,Vector tableValueV,int fixedColumn){
 		super();
-		setLayout(new BorderLayout());
+		setLayout(new java.awt.BorderLayout());
 		this.columnNameV=columnNameV;	//表格列名数组
 		this.tableValueV=tableValueV;	//表格数据数组
 		this.fixedColumn=fixedColumn;	//固定列数量
@@ -143,6 +141,6 @@ public class MFixedColumnTable extends JPanel {
 		viewport.setPreferredSize(fixedColumnTable.getPreferredSize());	//设置视口首选大小
 		scrollPane.setRowHeaderView(viewport);
 		scrollPane.setViewportView(floatingColumnTable);
-		add(scrollPane, BorderLayout.CENTER);
+		add(scrollPane, java.awt.BorderLayout.CENTER);
 	}
 }
