@@ -14,7 +14,7 @@ import javax.swing.JMenuItem;
 
 import java.awt.GridLayout;
 
-public class index extends JFrame {
+public class Index extends JFrame {
 
 	/**
 	 * 
@@ -29,7 +29,7 @@ public class index extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					index frame = new index();
+					Index frame = new Index();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -41,7 +41,7 @@ public class index extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public index() {
+	public Index() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100,100,675, 450);
 		this.setLocationRelativeTo(null);//窗口在屏幕中间显示

@@ -11,6 +11,11 @@ public class Conn {
 	public void setStatement(Statement statement) {
 		this.statement = statement;
 	}
+	
+
+	public Statement getStatement() {
+		return statement;
+	}
 
 
 	public void setConnection(Connection connection) {
@@ -30,7 +35,7 @@ public class Conn {
 	}
 	
 	//获得向数据库发送sql语句的对象
-	public boolean getStatement(){
+	public boolean getState(){
 		try{
 			if(null!=this.connection)
 				this.setStatement(this.connection.createStatement());

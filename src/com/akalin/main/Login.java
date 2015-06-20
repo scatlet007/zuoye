@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -14,6 +16,12 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+
+import com.akalin.admin.Index;
+import com.akalin.dao.Conn;
+import com.akalin.teacher.TeacherMain;
+import com.akalin.tool.Message;
+import com.akalin.userframe.StudentMain;
 
 public class Login extends JFrame {
 	
@@ -31,7 +39,7 @@ public class Login extends JFrame {
 	private JRadioButton register;		//注册链接
 	private JRadioButton forget;		//忘记密码链接
 	private JButton reset;			//顶部图片
-	
+	private String roleName;
 	public Login(){
 		init();
 	}
@@ -41,7 +49,8 @@ public class Login extends JFrame {
 	 */
 	public void init(){
 		jf=new JFrame();
-		jf.setBounds(600, 300, 450, 300);
+		jf.setBounds(100, 100, 450, 300);
+		jf.setLocationRelativeTo(null);
 		jf.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		JPanel main=new JPanel();	//主框架面板
 		main.setLayout(null);//面板布局
@@ -85,6 +94,7 @@ public class Login extends JFrame {
 	 * 窗体事件
 	 */
 	private void myEvent(){
+		//下拉列表事件
 		role.addItemListener(new ItemListener(){
 
 			@Override
@@ -93,26 +103,83 @@ public class Login extends JFrame {
 				 switch (e.getStateChange())
                  {
                  case ItemEvent.SELECTED: 
-                     System.out.println("选中" + e.getItem());
+                     //请在此添加选择下拉内容后的代码
+                	 //System.out.println("选中" + e.getItem());
+                	 roleName=(String)e.getItem();
                      break;
-                /* case ItemEvent.DESELECTED:
-                     System.out.println("取消选中" + e.getItem());
-                     break;*/
                  }
 			}
 			
 		});
+		
+		//点击登录按钮事件
 		submit.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("username->"+username.getText());
+				//请在此添加点击了登录按钮后的代码
+				String user=username.getText();
+				String pwds=password.getSelectedText();
+				
+				String driver="";		//数据库接口类名
+				String url="";			//数据库连接地址
+				String db_user="";		//数据库连接用户名
+				String db_password="";	//数据库连接密码
+				Conn conn=new Conn();
+				if(conn.getConnection(driver, url, db_user, db_password)){
+					if(conn.getState()){
+						String sql="";//请填写数据库的sql语句
+						try {
+							ResultSet resultSet=conn.getStatement().executeQuery(sql);
+							if(null!=resultSet){
+								if(roleName.equals("administractor")){
+									Index index=new Index();
+									index.pack();
+								}
+								if(roleName.equals("教师")){
+									TeacherMain teacherMain=new TeacherMain();
+									teacherMain.pack();
+								}
+								if(roleName.equals("学生")){
+									StudentMain studentMain=new StudentMain();
+									studentMain.pack();
+								}
+							}else{
+								Message message=new Message("该用户不存在，请确认用户名及密码是否正确！");
+								message.pack();
+							}
+						} catch (SQLException e1) {
+							e1.printStackTrace();
+							Message message=new Message("无法从数据库取出数据！");
+							message.pack();
+						}
+					}
+				}
 			}
 			
+		});
+		
+		//点击了注册选项事件
+		register.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//请在此添加点击了注册后的代码
+			}
+		});
+		
+		//点击了忘记了密码事件
+		forget.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//请在此添加点击了忘记密码后的代码
+			}
 		});
 	}
 	public static void main(String[] args){
 		Login login=new Login();
 		login.myEvent();
 	}
+	
 }
