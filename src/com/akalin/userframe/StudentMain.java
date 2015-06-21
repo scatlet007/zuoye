@@ -23,9 +23,17 @@ import javax.swing.JTable;
 import javax.swing.JLabel;
 
 import java.awt.GridLayout;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
 
 import javax.swing.border.EtchedBorder;
 import javax.swing.table.DefaultTableModel;
+
+import com.akalin.dao.Conn;
+import com.akalin.tool.Message;
+import com.frames.MFixedColumnTable;
 
 public class StudentMain extends JFrame {
 
@@ -36,7 +44,14 @@ public class StudentMain extends JFrame {
 	private JPanel contentPane;
 	private DefaultTableModel tableModel;
 	private JTable table;
-
+	private JMenuItem output;//导出到Excl
+	private JMenuItem lookCourse;//查看课表
+	private JMenuItem logout;//退出登录
+	private JMenuItem grammer;//柱形图
+	private JMenuItem pie;//饼形图
+	private JMenuItem about;//关于
+	private JComboBox term;//学期
+	private JComboBox termData;//学期数据
 	/**
 	 * Launch the application.
 	 */
@@ -44,7 +59,7 @@ public class StudentMain extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					StudentMain frame = new StudentMain();
+					StudentMain frame = new StudentMain("");
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -56,7 +71,7 @@ public class StudentMain extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public StudentMain() {
+	public StudentMain(String username) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100,675, 450);
 		this.setLocationRelativeTo(null);//窗口在屏幕中间显示
@@ -75,41 +90,41 @@ public class StudentMain extends JFrame {
 		JMenu file = new JMenu("文件");
 		menuBar.add(file);
 		
-		JMenuItem output = new JMenuItem("导出Excel");
+		output = new JMenuItem("导出Excel");
 		file.add(output);
 		
-		JMenuItem lookCourse=new JMenuItem("查看课表");
+		lookCourse=new JMenuItem("查看课表");
 		file.add(lookCourse);
 		
-		JMenuItem logout=new JMenuItem("退出");
+		logout=new JMenuItem("退出");
 		file.add(logout);
 		
 		JMenu view = new JMenu("视图");
 		menuBar.add(view);
 		
-		JMenuItem grammer=new JMenuItem("柱形图");
+		grammer=new JMenuItem("柱形图");
 		view.add(grammer);
 		
-		JMenuItem pie=new JMenuItem("饼形图");
+		pie=new JMenuItem("饼形图");
 		view.add(pie);
 		
 		JMenu help = new JMenu("帮助");
 		menuBar.add(help);
 		
-		JMenuItem about=new JMenuItem("关于");
+		about=new JMenuItem("关于");
 		help.add(about);
 		
 		JPanel centerPanel = new JPanel();
 		top.add(centerPanel, BorderLayout.SOUTH);
 		centerPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
-		JComboBox term = new JComboBox();
+		term = new JComboBox();
 		term.setMaximumRowCount(10);
 		term.addItem("学期");
 		term.addItem("学年");
 		centerPanel.add(term);
 		
-		JComboBox termData = new JComboBox();
+		termData = new JComboBox();
 		termData.setMaximumRowCount(10);
 		termData.addItem("1");
 		termData.addItem("2");
@@ -127,7 +142,7 @@ public class StudentMain extends JFrame {
 		});
 		centerPanel.add(search);
 		
-		JScrollPane scrollPane = new JScrollPane();
+		/*JScrollPane scrollPane = new JScrollPane();
 		contentPane.add(scrollPane, BorderLayout.CENTER);
 		
 		String[] columnValues={"序号","课程","学分","课程分类","考核方式","课程性质","成绩","取得学分","绩点","学分绩点"};
@@ -139,7 +154,34 @@ public class StudentMain extends JFrame {
 		}
 		tableModel=new DefaultTableModel(tableValues, columnValues);
 		table = new JTable(tableModel);
-		scrollPane.setViewportView(table);
+		scrollPane.setViewportView(table);*/
+		//复制 start
+		Vector<String> columnNameV=new Vector<String>();	//创建列名向量
+		columnNameV.add("学号");
+		columnNameV.add("课程");
+		columnNameV.add("学分");
+		columnNameV.add("课程分类");
+		columnNameV.add("考核方式");
+		columnNameV.add("课程性质");
+		columnNameV.add("成绩");
+		columnNameV.add("取得学分");
+		columnNameV.add("绩点");
+		columnNameV.add("取得绩点");
+		
+		Vector<Vector<Object>> tableValueV=new Vector<Vector<Object>>();//创建数据向量
+		for(int row=1;row<31;row++){
+			Vector<Object> rowV=new Vector<Object>();				//创建行向量
+			rowV.add(row);
+			for(int col=0;col<9;col++){
+				rowV.add("+");
+			}
+			tableValueV.add(rowV);									//把行向量添加到数据向量
+		}
+		//创建面板，在该面板中实现带行标题栏的表格
+		final MFixedColumnTable mainData=new MFixedColumnTable(columnNameV, tableValueV, 1);
+		mainData.setBorder(new EmptyBorder(20, 20, 20, 20));
+		contentPane.add(mainData, BorderLayout.CENTER);		//把面板添加到窗体中央
+		//复制 end
 		
 		JPanel footPanel = new JPanel();
 		contentPane.add(footPanel, BorderLayout.SOUTH);
@@ -183,5 +225,104 @@ public class StudentMain extends JFrame {
 		bottom.add(time);
 		
 	}
-
+	//窗体事件监听
+	public void myEvent(){
+		//导出到Excel
+		output.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
+		//查看课表
+		lookCourse.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
+		//退出登录
+		logout.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
+		//查看柱形图
+		grammer.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
+		//查看饼形图
+		pie.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
+		//查看关于
+		about.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
+	}
+	//按学期查看成绩
+	public List<Object> queryByTerm()throws Exception{
+		Conn conn=new Conn();
+		String driver="com.mysql.jdbc.Driver";		//数据库接口类名
+		String url="jdbc:mysql://127.0.0.1/db_akalin";			//数据库连接地址
+		String db_user="root";		//数据库连接用户名
+		String db_password="12345";	//数据库连接密码
+		List<Object> list=new ArrayList<Object>();
+		if(conn.getConnection(driver, url, db_user, db_password)){
+			conn.getState();
+			String sql="";
+			ResultSet resultSet=conn.getStatement().executeQuery(sql);
+			while(resultSet.next()){
+				list.add(resultSet.getString("teamName"));
+			}
+			resultSet.close();
+			conn.close();
+		}else{
+			Message message=new Message("网络错误，无法连接到数据库");
+			message.pack();
+			conn.close();
+		}
+		return list;
+	}
+	//按学年查看成绩
+	
+	public List<Object> queryByYear() throws Exception{
+		Conn conn=new Conn();
+		String driver="com.mysql.jdbc.Driver";		//数据库接口类名
+		String url="jdbc:mysql://127.0.0.1/db_akalin";			//数据库连接地址
+		String db_user="root";		//数据库连接用户名
+		String db_password="12345";	//数据库连接密码
+		List<Object> list=new ArrayList<Object>();
+		if(conn.getConnection(driver, url, db_user, db_password)){
+			conn.getState();
+			String sql="";
+			ResultSet resultSet=conn.getStatement().executeQuery(sql);
+			while(resultSet.next()){
+				list.add(resultSet.getString("teamName"));
+			}
+			resultSet.close();
+			conn.close();
+		}else{
+			Message message=new Message("网络错误，无法连接到数据库");
+			message.pack();
+			conn.close();
+		}
+		return list;
+	}
 }

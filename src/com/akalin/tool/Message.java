@@ -19,7 +19,7 @@ public class Message extends JDialog {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		try {
 			Message dialog = new Message("");
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -27,7 +27,7 @@ public class Message extends JDialog {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
+	}*/
 
 	public boolean isOk() {
 		return ok;
@@ -89,6 +89,8 @@ public class Message extends JDialog {
 				buttonPane.add(cancelButton);
 			}
 		}
+		setDefaultCloseOperation(HIDE_ON_CLOSE);
+		setVisible(true);
 	}
 
 }

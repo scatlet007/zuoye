@@ -10,8 +10,6 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-
 import java.awt.GridLayout;
 
 public class Index extends JFrame {

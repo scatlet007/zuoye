@@ -22,6 +22,7 @@ import com.akalin.dao.Conn;
 import com.akalin.teacher.TeacherMain;
 import com.akalin.tool.Message;
 import com.akalin.userframe.StudentMain;
+import com.akalin.userframe.StudentRegister;
 
 public class Login extends JFrame {
 	
@@ -121,10 +122,10 @@ public class Login extends JFrame {
 				String user=username.getText();
 				String pwds=password.getSelectedText();
 				
-				String driver="";		//数据库接口类名
-				String url="";			//数据库连接地址
-				String db_user="";		//数据库连接用户名
-				String db_password="";	//数据库连接密码
+				String driver="com.mysql.jdbc.Driver";		//数据库接口类名
+				String url="jdbc:mysql://127.0.0.1/db_akalin";			//数据库连接地址
+				String db_user="root";		//数据库连接用户名
+				String db_password="12345";	//数据库连接密码
 				Conn conn=new Conn();
 				if(conn.getConnection(driver, url, db_user, db_password)){
 					if(conn.getState()){
@@ -141,7 +142,7 @@ public class Login extends JFrame {
 									teacherMain.pack();
 								}
 								if(roleName.equals("学生")){
-									StudentMain studentMain=new StudentMain();
+									StudentMain studentMain=new StudentMain(username.getText());
 									studentMain.pack();
 								}
 							}else{
@@ -155,6 +156,8 @@ public class Login extends JFrame {
 						}
 					}
 				}
+				/*Message message=new Message("该用户不存在，请确认用户名及密码是否正确！");
+				message.pack();*/
 			}
 			
 		});
@@ -165,6 +168,8 @@ public class Login extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				//请在此添加点击了注册后的代码
+				StudentRegister register=new StudentRegister();
+				register.pack();
 			}
 		});
 		
