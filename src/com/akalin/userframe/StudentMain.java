@@ -25,7 +25,9 @@ import javax.swing.JLabel;
 import java.awt.GridLayout;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.border.EtchedBorder;
@@ -52,6 +54,8 @@ public class StudentMain extends JFrame {
 	private JMenuItem about;//关于
 	private JComboBox term;//学期
 	private JComboBox termData;//学期数据
+	private List<Map<String, Object>> list;//用于保存成绩数据的集合
+	
 	/**
 	 * Launch the application.
 	 */
@@ -157,12 +161,11 @@ public class StudentMain extends JFrame {
 		scrollPane.setViewportView(table);*/
 		//复制 start
 		Vector<String> columnNameV=new Vector<String>();	//创建列名向量
-		columnNameV.add("学号");
+		columnNameV.add("序号");
 		columnNameV.add("课程");
 		columnNameV.add("学分");
 		columnNameV.add("课程分类");
 		columnNameV.add("考核方式");
-		columnNameV.add("课程性质");
 		columnNameV.add("成绩");
 		columnNameV.add("取得学分");
 		columnNameV.add("绩点");
@@ -172,7 +175,7 @@ public class StudentMain extends JFrame {
 		for(int row=1;row<31;row++){
 			Vector<Object> rowV=new Vector<Object>();				//创建行向量
 			rowV.add(row);
-			for(int col=0;col<9;col++){
+			for(int col=0;col<8;col++){
 				rowV.add("+");
 			}
 			tableValueV.add(rowV);									//把行向量添加到数据向量
@@ -194,14 +197,11 @@ public class StudentMain extends JFrame {
 		JLabel lblNewLabel = new JLabel("");
 		panel.add(lblNewLabel);
 		
-		JLabel nowCredit = new JLabel("目前获得的学分：");
+		JLabel nowCredit = new JLabel("获得的学分：");
 		panel.add(nowCredit);
 		
 		JLabel averige = new JLabel("主课平均成绩：");
 		panel.add(averige);
-		
-		JLabel limitCredit = new JLabel("剩余学分：");
-		panel.add(limitCredit);
 		
 		JPanel bottom = new JPanel();
 		//bottom.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
@@ -277,19 +277,30 @@ public class StudentMain extends JFrame {
 		});
 	}
 	//按学期查看成绩
-	public List<Object> queryByTerm()throws Exception{
+	public List<Map<String,Object>> queryByTerm()throws Exception{
 		Conn conn=new Conn();
 		String driver="com.mysql.jdbc.Driver";		//数据库接口类名
 		String url="jdbc:mysql://127.0.0.1/db_akalin";			//数据库连接地址
 		String db_user="root";		//数据库连接用户名
 		String db_password="12345";	//数据库连接密码
-		List<Object> list=new ArrayList<Object>();
+		
 		if(conn.getConnection(driver, url, db_user, db_password)){
 			conn.getState();
 			String sql="";
+			Map<String,Object> map=new HashMap<String, Object>();
 			ResultSet resultSet=conn.getStatement().executeQuery(sql);
 			while(resultSet.next()){
-				list.add(resultSet.getString("teamName"));
+				//list.add(resultSet.getString("teamName"));
+				//向集合添加元素
+				map.put("课程", resultSet.getString("course"));
+				map.put("学分", resultSet.getString("credit"));
+				map.put("课程分类", resultSet.getString("type"));
+				map.put("考核方式", resultSet.getString("type2"));
+				map.put("成绩", resultSet.getString("grade"));
+				map.put("取得学分", resultSet.getString("getCredit"));
+				map.put("绩点", resultSet.getString("dit"));
+				map.put("取得绩点", resultSet.getString("getDit"));
+				list.add(map);
 			}
 			resultSet.close();
 			conn.close();
@@ -314,7 +325,8 @@ public class StudentMain extends JFrame {
 			String sql="";
 			ResultSet resultSet=conn.getStatement().executeQuery(sql);
 			while(resultSet.next()){
-				list.add(resultSet.getString("teamName"));
+				//list.add(resultSet.getString("teamName"));
+				//向集合添加元素
 			}
 			resultSet.close();
 			conn.close();
@@ -324,5 +336,24 @@ public class StudentMain extends JFrame {
 			conn.close();
 		}
 		return list;
+	}
+	
+	//计算总学分
+	public int count(){
+		int sum=0;
+		for(Map m:list){
+			sum=sum+(int)m.get("取得学分");
+		}
+		return sum;
+	}
+	
+	//计算主课平均分
+	public int averige(){
+		int sum=0;
+		for(Map m:list){
+			if(m.get("取得学分").equals("考试"))
+				sum=sum+(int)m.get("成绩");
+		}
+		return sum;
 	}
 }

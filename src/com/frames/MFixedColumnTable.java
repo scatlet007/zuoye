@@ -123,6 +123,7 @@ public class MFixedColumnTable extends javax.swing.JPanel {
 		//创建固定列表格
 		fixedColumnTableModel=new FixedColumnTableModel();					//创建固定列表格模型对象
 		fixedColumnTable=new JTable(fixedColumnTableModel);					//创建固定列表格对象
+		fixedColumnTable.setRowHeight(24);
 		ListSelectionModel fixed=fixedColumnTable.getSelectionModel();		//获得选择模型对象
 		fixed.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);		//选择模式为单选
 		fixed.addListSelectionListener(new MListSelectionListener(true));	//添加行被选中的事件监听器
@@ -130,6 +131,7 @@ public class MFixedColumnTable extends javax.swing.JPanel {
 		floatingColumnTableModel=new FloatingColumnTableModel();			//创建可移动列表格模型对象
 		floatingColumnTable=new JTable(floatingColumnTableModel);			//创建可移动列表格对象
 		floatingColumnTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);		//关闭表格的自动调整功能
+		floatingColumnTable.setRowHeight(24);
 		ListSelectionModel floating=floatingColumnTable.getSelectionModel();//获得选择模型对象
 		floating.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);		//选择模式为单选
 		floating.addListSelectionListener(new MListSelectionListener(false));//添加行被选中的事件监听器
