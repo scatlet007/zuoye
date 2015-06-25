@@ -6,6 +6,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -19,6 +20,7 @@ import javax.swing.JTextField;
 
 import com.akalin.admin.Index;
 import com.akalin.dao.Conn;
+import com.akalin.dao.DAO;
 import com.akalin.teacher.TeacherMain;
 import com.akalin.tool.Message;
 import com.akalin.userframe.StudentMain;
@@ -31,18 +33,21 @@ public class Login extends JFrame {
 	 */
 	private static final long serialVersionUID = 8894157331136913733L;
 	private JFrame jf;				//窗体
-	private JComboBox<String> role;			//角色下拉列表框
+	private JComboBox<String> role;	//角色下拉列表框
 	private JLabel name;			//用户名标签
 	private JLabel pwd;				//密码标签
 	private	JTextField username;	//用户名输入框
-	private JPasswordField password;//密码输入框
+	private JTextField password;	//密码输入框
 	private JButton submit;			//提交按钮
-	private JRadioButton register;		//注册链接
-	private JRadioButton forget;		//忘记密码链接
+	private JRadioButton register;	//注册链接
+	private JRadioButton forget;	//忘记密码链接
 	private JButton reset;			//顶部图片
 	private String roleName;
 	public Login(){
 		init();
+		if(checkRole()==0)
+			initRole();
+		initTeacher();
 	}
 	
 	/**
@@ -56,8 +61,9 @@ public class Login extends JFrame {
 		JPanel main=new JPanel();	//主框架面板
 		main.setLayout(null);//面板布局
 		role=new JComboBox<String>();
-		role.addItem("teacher");
-		role.addItem("student");
+		role.addItem("教师");
+		role.addItem("学生");
+		role.addItem("管理员");
 		role.setBounds(160, 50, 100, 24);
 		main.add(role);
 		name=new JLabel("用户名:");
@@ -69,7 +75,7 @@ public class Login extends JFrame {
 		pwd=new JLabel("密码:");
 		pwd.setBounds(110, 128, 60, 24);
 		main.add(pwd);
-		password=new JPasswordField(24);
+		password=new JTextField(24);
 		password.setBounds(162, 128, 160, 24);
 		main.add(password);
 		register=new JRadioButton("注册");
@@ -120,44 +126,68 @@ public class Login extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				//请在此添加点击了登录按钮后的代码
 				String user=username.getText();
-				String pwds=password.getSelectedText();
-				
-				String driver="com.mysql.jdbc.Driver";		//数据库接口类名
-				String url="jdbc:mysql://127.0.0.1/db_akalin";			//数据库连接地址
-				String db_user="root";		//数据库连接用户名
-				String db_password="12345";	//数据库连接密码
-				Conn conn=new Conn();
-				if(conn.getConnection(driver, url, db_user, db_password)){
-					if(conn.getState()){
-						String sql="";//请填写数据库的sql语句
-						try {
-							ResultSet resultSet=conn.getStatement().executeQuery(sql);
-							if(null!=resultSet){
-								if(roleName.equals("administractor")){
-									Index index=new Index();
-									index.pack();
-								}
-								if(roleName.equals("教师")){
-									TeacherMain teacherMain=new TeacherMain();
-									teacherMain.pack();
-								}
-								if(roleName.equals("学生")){
-									StudentMain studentMain=new StudentMain(username.getText());
-									studentMain.pack();
-								}
+				String pwds=password.getText();
+				DAO dao=new DAO();
+				String[] str={"id","name","roleId"};
+				if(roleName.equals("管理员")){
+					String sql="select * from teacher where name='"+user+"'and password='"+pwds+"';";
+					List<List<Object>> list=dao.query(sql, str);
+					int array[]={1,2};
+					if(!list.isEmpty()){
+						for(List<Object> ls:list){
+							if(!dao.query("select * from role where id='"+ls.get(0)+"';",array).isEmpty()){
+								Index index=new Index(user);
+								index.pack();
 							}else{
-								Message message=new Message("该用户不存在，请确认用户名及密码是否正确！");
+								Message message=new Message("无权访问！");
 								message.pack();
 							}
-						} catch (SQLException e1) {
-							e1.printStackTrace();
-							Message message=new Message("无法从数据库取出数据！");
+						}
+					}else{
+						int[] x={1,2,3};
+						if(!dao.query("select * from admin where name='"+user+"'and password='"+pwds+"';", x).isEmpty()){
+							list=dao.query("select * from admin where name='"+user+"'and password='"+pwds+"';", x);
+							for(List<Object> l:list){
+								for(Object obj:l){
+									System.out.print(obj+"\t");
+								}
+							}
+							System.out.println("www");
+							Index index=new Index(user);
+							//index.pack();
+							jf.setVisible(false);
+						}else{
+							list=dao.query("select * from admin where name='"+user+"'and password='"+pwds+"';", x);
+							for(List<Object> l:list){
+								for(Object obj:l){
+									System.out.print(obj+"\t");
+								}
+							}
+							Message message=new Message("无权访问！,请查看是否有输入错误！");
 							message.pack();
 						}
 					}
+				}else if(roleName.equals("教师")){
+					String sql="select * from teacher where name='"+user+"'and password='"+pwds+"';";
+					List<List<Object>> list=dao.query(sql, str);
+					if(!list.isEmpty()){
+						TeacherMain teacherMain=new TeacherMain(user);
+						teacherMain.pack();
+					}else{
+						Message message=new Message("无权访问！数据库里应该还没有你的名字！");
+						message.pack();
+					}
+				}else{
+					String sql="select * from student where name='"+user+"'and password='"+pwds+"';";
+					List<List<Object>> list=dao.query(sql, str);
+					if(!list.isEmpty()){
+						StudentMain studentMain=new StudentMain(user);
+						studentMain.pack();
+					}else{
+						Message message=new Message("无权访问！数据库里应该还没有你的名字！");
+						message.pack();
+					}
 				}
-				/*Message message=new Message("该用户不存在，请确认用户名及密码是否正确！");
-				message.pack();*/
 			}
 			
 		});
@@ -187,4 +217,32 @@ public class Login extends JFrame {
 		login.myEvent();
 	}
 	
+	//检查角色表是否为空
+	public int checkRole(){
+		int[] array={1,2,3};
+		DAO dao=new DAO();
+		String sql="select * from role;";
+		List<List<Object>> list=dao.query(sql, array);
+		if(list.isEmpty())
+			return 0;
+		else
+			return 1;
+	}
+	
+	//初始化角色表
+	public void initRole(){
+		DAO dao=new DAO();
+		String sql="insert into role values('role1001','administractor','管理员');";
+		dao.add(sql);
+	}
+	
+	//初始化一个管理员
+	public void initTeacher(){
+		DAO dao=new DAO();
+		String sql="insert into admin values('admin1001','akalin','12345');";
+		int array[]={1,2,3};
+		if(dao.query("select * from admin;", array).isEmpty()){
+			dao.add(sql);
+		}
+	}
 }

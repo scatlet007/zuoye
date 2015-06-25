@@ -1,4 +1,4 @@
-package com.frames;
+package com.akalin.teacher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -162,7 +162,6 @@ public class MFixedColumnTable extends javax.swing.JPanel {
 	//获取表格某一选中的行的值
 	public final Vector<Vector<Object>> getValue(int arg0){
 		list=new Vector<Vector<Object>>();
-		//this.tableValueV.get(arg0).add(columnNameV.get(arg0));
 		this.list.add(this.tableValueV.get(arg0));
 		return this.list;
 	}
@@ -189,14 +188,6 @@ public class MFixedColumnTable extends javax.swing.JPanel {
 
 	public void setFixedColumnTable(JTable fixedColumnTable) {
 		this.fixedColumnTable = fixedColumnTable;
-	}
-
-	public JTable getFloatingColumnTable() {
-		return floatingColumnTable;
-	}
-
-	public void setFloatingColumnTable(JTable floatingColumnTable) {
-		this.floatingColumnTable = floatingColumnTable;
 	}
 	
 	

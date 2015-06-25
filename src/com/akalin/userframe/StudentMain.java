@@ -94,8 +94,8 @@ public class StudentMain extends JFrame {
 		JMenu file = new JMenu("文件");
 		menuBar.add(file);
 		
-		output = new JMenuItem("导出Excel");
-		file.add(output);
+		/*output = new JMenuItem("导出Excel");
+		file.add(output);*/
 		
 		lookCourse=new JMenuItem("查看课表");
 		file.add(lookCourse);
@@ -103,14 +103,14 @@ public class StudentMain extends JFrame {
 		logout=new JMenuItem("退出");
 		file.add(logout);
 		
-		JMenu view = new JMenu("视图");
+		/*JMenu view = new JMenu("视图");
 		menuBar.add(view);
 		
 		grammer=new JMenuItem("柱形图");
 		view.add(grammer);
 		
 		pie=new JMenuItem("饼形图");
-		view.add(pie);
+		view.add(pie);*/
 		
 		JMenu help = new JMenu("帮助");
 		menuBar.add(help);
@@ -172,16 +172,16 @@ public class StudentMain extends JFrame {
 		columnNameV.add("取得绩点");
 		
 		Vector<Vector<Object>> tableValueV=new Vector<Vector<Object>>();//创建数据向量
-		for(int row=1;row<31;row++){
+		for(int row=2;row<31;row++){
 			Vector<Object> rowV=new Vector<Object>();				//创建行向量
 			rowV.add(row);
-			for(int col=0;col<8;col++){
+			for(int col=1;col<9;col++){
 				rowV.add("+");
 			}
 			tableValueV.add(rowV);									//把行向量添加到数据向量
 		}
 		//创建面板，在该面板中实现带行标题栏的表格
-		final MFixedColumnTable mainData=new MFixedColumnTable(columnNameV, tableValueV, 1);
+		final MFixedColumnTable mainData=new MFixedColumnTable(columnNameV, tableValueV, 2);
 		mainData.setBorder(new EmptyBorder(20, 20, 20, 20));
 		contentPane.add(mainData, BorderLayout.CENTER);		//把面板添加到窗体中央
 		//复制 end
@@ -227,7 +227,7 @@ public class StudentMain extends JFrame {
 	}
 	//窗体事件监听
 	public void myEvent(){
-		//导出到Excel
+		//导出到Excel(预留)
 		output.addActionListener(new ActionListener() {
 			
 			@Override
@@ -251,7 +251,7 @@ public class StudentMain extends JFrame {
 				
 			}
 		});
-		//查看柱形图
+		//查看柱形图(预留)
 		grammer.addActionListener(new ActionListener() {
 			
 			@Override
@@ -259,7 +259,7 @@ public class StudentMain extends JFrame {
 				
 			}
 		});
-		//查看饼形图
+		//查看饼形图(预留)
 		pie.addActionListener(new ActionListener() {
 			
 			@Override
@@ -279,12 +279,7 @@ public class StudentMain extends JFrame {
 	//按学期查看成绩
 	public List<Map<String,Object>> queryByTerm()throws Exception{
 		Conn conn=new Conn();
-		String driver="com.mysql.jdbc.Driver";		//数据库接口类名
-		String url="jdbc:mysql://127.0.0.1/db_akalin";			//数据库连接地址
-		String db_user="root";		//数据库连接用户名
-		String db_password="12345";	//数据库连接密码
-		
-		if(conn.getConnection(driver, url, db_user, db_password)){
+		if(conn.getConnection()){
 			conn.getState();
 			String sql="";
 			Map<String,Object> map=new HashMap<String, Object>();
@@ -315,12 +310,8 @@ public class StudentMain extends JFrame {
 	
 	public List<Object> queryByYear() throws Exception{
 		Conn conn=new Conn();
-		String driver="com.mysql.jdbc.Driver";		//数据库接口类名
-		String url="jdbc:mysql://127.0.0.1/db_akalin";			//数据库连接地址
-		String db_user="root";		//数据库连接用户名
-		String db_password="12345";	//数据库连接密码
 		List<Object> list=new ArrayList<Object>();
-		if(conn.getConnection(driver, url, db_user, db_password)){
+		if(conn.getConnection()){
 			conn.getState();
 			String sql="";
 			ResultSet resultSet=conn.getStatement().executeQuery(sql);

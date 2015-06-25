@@ -5,19 +5,29 @@ import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 
+import com.akalin.dao.Conn;
+import com.akalin.tool.Message;
 import com.frames.MFixedColumnTable;
 
 public class TeacherMain extends JFrame {
@@ -34,6 +44,8 @@ public class TeacherMain extends JFrame {
 	private JMenuItem setFuntion;	//自定义函数
 	private JMenuItem selectFuntion;//选择函数
 	private JMenuItem about;		//关于
+	private JComboBox scrn;		//筛选方式
+	private JTextField condition;	//筛选条件
 	private JLabel sno1;			//学号 
 	private JLabel sname1;			//名字
 	private JLabel grade1;			//成绩
@@ -51,6 +63,10 @@ public class TeacherMain extends JFrame {
 	private JTextField te4;//期末
 	private JButton submit;//
 	private JButton modify;//
+	private List<Map<String,Object>> list;
+	private ListSelectionModel fixed;
+	private int flag=0;
+	private final MFixedColumnTable mainData;
 	/**
 	 * Launch the application.
 	 */
@@ -58,7 +74,7 @@ public class TeacherMain extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					TeacherMain frame = new TeacherMain();
+					TeacherMain frame = new TeacherMain("");
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -70,10 +86,10 @@ public class TeacherMain extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public TeacherMain() {
+	public TeacherMain(String username) {
 		setTitle("教师主界面");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 810, 540);
+		setBounds(100, 100, 900, 600);
 		setLocationRelativeTo(null);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -138,7 +154,15 @@ public class TeacherMain extends JFrame {
 		JPanel topCenter=new JPanel();//存放浮动式组件
 		contentPane.add(topCenter, BorderLayout.CENTER);
 		topCenter.setLayout(new BorderLayout(0, 0));
-		
+		JPanel jtop=new JPanel();
+		topCenter.add(jtop, BorderLayout.NORTH);
+		scrn=new JComboBox();
+		scrn.addItem("成绩");
+		scrn.addItem("学分");
+		scrn.addItem("班级");
+		jtop.add(scrn);
+		condition=new JTextField(20);
+		jtop.add(condition);
 		//复制 start
 		Vector<String> columnNameV=new Vector<String>();	//创建列名向量
 		columnNameV.add("学号");
@@ -153,7 +177,7 @@ public class TeacherMain extends JFrame {
 		columnNameV.add("取得绩点");
 				
 		Vector<Vector<Object>> tableValueV=new Vector<Vector<Object>>();//创建数据向量
-		for(int row=1;row<31;row++){
+		for(int row=0;row<31;row++){
 			Vector<Object> rowV=new Vector<Object>();				//创建行向量
 			rowV.add(row);
 			for(int col=0;col<9;col++){
@@ -162,9 +186,12 @@ public class TeacherMain extends JFrame {
 			tableValueV.add(rowV);									//把行向量添加到数据向量
 		}
 		//创建面板，在该面板中实现带行标题栏的表格
-		final MFixedColumnTable mainData=new MFixedColumnTable(columnNameV, tableValueV, 1);
+		mainData=new MFixedColumnTable(columnNameV, tableValueV, 1);
 		mainData.setBorder(new EmptyBorder(20, 20, 20, 20));
-		contentPane.add(mainData, BorderLayout.CENTER);		//把面板添加到窗体中央
+		topCenter.add(mainData, BorderLayout.CENTER);		//把面板添加到窗体中央
+		JTable f=mainData.getFixedColumnTable();
+		fixed=f.getSelectionModel();
+		fixed.addListSelectionListener(new MyListener());
 		//复制 end
 		
 		JPanel footPanel = new JPanel();
@@ -255,7 +282,7 @@ public class TeacherMain extends JFrame {
 	}
 	
 	public void myEvent(){
-		//导出excel
+		//导出excel(预留)
 		output.addActionListener(new ActionListener() {
 			
 			@Override
@@ -304,7 +331,7 @@ public class TeacherMain extends JFrame {
 				
 			}
 		});
-		//饼形图
+		//饼形图(预留)
 		pie.addActionListener(new ActionListener() {
 			
 			@Override
@@ -312,7 +339,7 @@ public class TeacherMain extends JFrame {
 				
 			}
 		});
-		//柱形图
+		//柱形图(预留)
 		diagram.addActionListener(new ActionListener() {
 			
 			@Override
@@ -349,7 +376,21 @@ public class TeacherMain extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				Conn conn=new Conn();
+				if(conn.getConnection()){
+					conn.getState();
+					String sql="";//请填写插入的sql语句
+					try {
+						conn.getStatement().executeQuery(sql);
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+					conn.close();
+				}else{
+					Message message=new Message("网络错误，无法连接到数据库");
+					message.pack();
+					conn.close();
+				}
 			}
 		});
 		//点击了修改按钮
@@ -357,9 +398,39 @@ public class TeacherMain extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				Conn conn=new Conn();
+				if(conn.getConnection()){
+					conn.getState();
+					String sql="";//请填写插入的sql语句
+					try {
+						conn.getStatement().executeQuery(sql);
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+					conn.close();
+				}else{
+					Message message=new Message("网络错误，无法连接到数据库");
+					message.pack();
+					conn.close();
+				}
 			}
 		});
 	}
-
+	//选中某一行表格的数据，并将其显示在填写栏
+		private class MyListener implements ListSelectionListener{
+			int i=0;
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if(flag!=mainData.getSelectRow()){
+					List<Vector<Object>> list=mainData.getList();
+					for(Vector<Object> vec:list){
+						sno.setText(vec.get(0).toString());
+						sname.setText(vec.get(1).toString());
+						grade.setText(vec.get(6).toString());
+					}
+					flag=mainData.getSelectRow();
+				}
+			}
+			
+		}
 }

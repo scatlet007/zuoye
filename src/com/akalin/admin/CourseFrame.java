@@ -27,11 +27,18 @@ public class CourseFrame extends JFrame {
 	private JTextField course;
 	private JTextField credit;
 	private JTable table;
-
+	private JMenu collegeManaer;
+	private JMenu majorManager;
+	private JMenu teamManager;
+	private JMenu teacherManager;
+	private JMenu studentManager;
+	private JMenu courseManager;
+	private JMenu roleManager;
+	private String manager;
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -42,12 +49,17 @@ public class CourseFrame extends JFrame {
 				}
 			}
 		});
-	}
+	}*/
 
 	/**
 	 * Create the frame.
 	 */
-	public CourseFrame() {
+	public CourseFrame(String username) {
+		manager=username;
+		init();
+	}
+	
+	public void init(){
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 900, 600);
 		this.setLocationRelativeTo(null);
@@ -64,25 +76,25 @@ public class CourseFrame extends JFrame {
 		JMenuBar menuBar = new JMenuBar();
 		panel.add(menuBar);
 		
-		JMenu collegeManaer = new JMenu("学院管理");
+		collegeManaer = new JMenu("学院管理");
 		menuBar.add(collegeManaer);
 		
-		JMenu majorManager = new JMenu("专业管理");
+		majorManager = new JMenu("专业管理");
 		menuBar.add(majorManager);
 		
-		JMenu teamManager = new JMenu("班级管理");
+		teamManager = new JMenu("班级管理");
 		menuBar.add(teamManager);
 		
-		JMenu teacherManager = new JMenu("教师管理");
+		teacherManager = new JMenu("教师管理");
 		menuBar.add(teacherManager);
 		
-		JMenu studentManager = new JMenu("学生管理");
+		studentManager = new JMenu("学生管理");
 		menuBar.add(studentManager);
 		
-		JMenu courseManager = new JMenu("课程管理");
+		courseManager = new JMenu("课程管理");
 		menuBar.add(courseManager);
 		
-		JMenu roleManager = new JMenu("角色管理");
+		roleManager = new JMenu("角色管理");
 		menuBar.add(roleManager);
 		
 		JLabel course1 = new JLabel("课程名：");
@@ -164,7 +176,7 @@ public class CourseFrame extends JFrame {
 		welcome.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		panel_2.add(welcome);
 		
-		JLabel ctrl = new JLabel("使用者：");
+		JLabel ctrl = new JLabel("使用者："+manager);
 		ctrl.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		panel_2.add(ctrl);
 		
@@ -183,6 +195,10 @@ public class CourseFrame extends JFrame {
 		JButton delete = new JButton("删除");
 		delete.setBounds(700, 105, 93, 23);
 		contentPanel.add(delete);
+		setVisible(true);
 	}
-
+	
+	public void myEvent(){
+		
+	}
 }

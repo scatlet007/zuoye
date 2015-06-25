@@ -162,12 +162,8 @@ public class StudentRegister extends JFrame {
 	//获得班级下拉列表的数据
 	public List<Object> getTeam() throws Exception{
 		Conn conn=new Conn();
-		String driver="com.mysql.jdbc.Driver";		//数据库接口类名
-		String url="jdbc:mysql://127.0.0.1/db_akalin";			//数据库连接地址
-		String db_user="root";		//数据库连接用户名
-		String db_password="12345";	//数据库连接密码
 		List<Object> list=new ArrayList<Object>();
-		if(conn.getConnection(driver, url, db_user, db_password)){
+		if(conn.getConnection()){
 			conn.getState();
 			String sql="";
 			ResultSet resultSet=conn.getStatement().executeQuery(sql);
@@ -186,12 +182,8 @@ public class StudentRegister extends JFrame {
 	//判断是否已有该用户
 	public boolean isUser(String team,String userName,String snumber){
 		Conn conn=new Conn();
-		String driver="com.mysql.jdbc.Driver";		//数据库接口类名
-		String url="jdbc:mysql://127.0.0.1/db_akalin";			//数据库连接地址
-		String db_user="root";		//数据库连接用户名
-		String db_password="12345";	//数据库连接密码
 		List<Object> list=new ArrayList<Object>();
-		if(conn.getConnection(driver, url, db_user, db_password)){
+		if(conn.getConnection()){
 			conn.getState();
 			String sql="";
 			ResultSet resultSet;
@@ -222,12 +214,8 @@ public class StudentRegister extends JFrame {
 	//添加用户
 	public void addUser(String team,String username,String password,String sex,String snumber)throws Exception{
 		Conn conn=new Conn();
-		String driver="com.mysql.jdbc.Driver";		//数据库接口类名
-		String url="jdbc:mysql://127.0.0.1/db_akalin";			//数据库连接地址
-		String db_user="root";		//数据库连接用户名
-		String db_password="12345";	//数据库连接密码
 		List<Object> list=new ArrayList<Object>();
-		if(conn.getConnection(driver, url, db_user, db_password)){
+		if(conn.getConnection()){
 			conn.getState();
 			String sql="";
 			conn.getStatement().executeUpdate(sql);

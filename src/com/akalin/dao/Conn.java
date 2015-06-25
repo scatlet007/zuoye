@@ -23,8 +23,12 @@ public class Conn {
 	}
 
 	//获得数据库连接
-	public boolean getConnection(String driver,String url,String user,String password){
+	public boolean getConnection(){
 		try{
+			String driver="com.mysql.jdbc.Driver";			//数据库接口类名
+			String url="jdbc:mysql://127.0.0.1/zuoye";	//数据库连接地址
+			String user="root";							//数据库连接用户名
+			String password="12345";						//数据库连接密码
 			Class.forName(driver);
 			this.setConnection(DriverManager.getConnection(url, user, password));
 		}catch(Exception e){

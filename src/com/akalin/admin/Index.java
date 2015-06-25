@@ -1,16 +1,27 @@
 package com.akalin.admin;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuKeyEvent;
+import javax.swing.event.MenuKeyListener;
+import javax.swing.event.MenuListener;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 public class Index extends JFrame {
 
@@ -19,27 +30,47 @@ public class Index extends JFrame {
 	 */
 	private static final long serialVersionUID = 8810450090270436228L;
 	private JPanel contentPane;
-
+	private JMenu collegeManager;
+	private JMenu majorManager;
+	private JMenu teamManager;
+	private JMenu teacherManager;
+	private JMenu studentManager;
+	private JMenu courseManager;
+	private JMenu roleManager;
+	private JMenuItem collegeAdd;
+	private JMenuItem majorAdd;
+	private JMenuItem teamAdd;
+	private JMenuItem teacherAdd;
+	private JMenuItem studentAdd;
+	private JMenuItem courseAdd;
+	private JMenuItem roleAdd;
+	private String manager;
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+/*	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Index frame = new Index();
+					Index frame = new Index("");
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
-	}
+	}*/
 
 	/**
 	 * Create the frame.
 	 */
-	public Index() {
+	public Index(String username) {
+		manager=username;
+		init();
+		myEvent();
+	}
+	
+	public void init(){
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100,100,675, 450);
 		this.setLocationRelativeTo(null);//窗口在屏幕中间显示
@@ -55,26 +86,41 @@ public class Index extends JFrame {
 		JMenuBar menuBar = new JMenuBar();
 		top.add(menuBar, BorderLayout.NORTH);
 		
-		JMenu collegeManaer = new JMenu("学院管理");
-		menuBar.add(collegeManaer);
+		collegeManager = new JMenu("学院管理");
+		menuBar.add(collegeManager);
 		
-		JMenu majorManager = new JMenu("专业管理");
+		majorManager = new JMenu("专业管理");
 		menuBar.add(majorManager);
 		
-		JMenu teamManager = new JMenu("班级管理");
+		teamManager = new JMenu("班级管理");
 		menuBar.add(teamManager);
 		
-		JMenu teacherManager = new JMenu("教师管理");
+		teacherManager = new JMenu("教师管理");
 		menuBar.add(teacherManager);
 		
-		JMenu studentManager = new JMenu("学生管理");
+		studentManager = new JMenu("学生管理");
 		menuBar.add(studentManager);
 		
-		JMenu courseManager = new JMenu("课程管理");
+		courseManager = new JMenu("课程管理");
 		menuBar.add(courseManager);
 		
-		JMenu roleManager = new JMenu("角色管理");
+		roleManager = new JMenu("角色管理");
 		menuBar.add(roleManager);
+		
+		collegeAdd=new JMenuItem("学院添加");
+		collegeManager.add(collegeAdd);
+		majorAdd=new JMenuItem("专业添加");
+		majorManager.add(majorAdd);
+		teamAdd=new JMenuItem("班级添加"); 
+		teamManager.add(teamAdd);
+		teacherAdd=new JMenuItem("教师添加");
+		teacherManager.add(teacherAdd);
+		studentAdd=new JMenuItem("学生添加");
+		courseAdd=new JMenuItem("课程添加");
+		courseManager.add(courseAdd);
+		studentManager.add(studentAdd);
+		roleAdd=new JMenuItem("角色添加");
+		roleManager.add(roleAdd);
 		
 		//添加背景
 		BackPanel backPanel=new BackPanel(675,350);
@@ -88,7 +134,7 @@ public class Index extends JFrame {
 		welcome.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		bottom.add(welcome);
 		
-		JLabel user = new JLabel("操作者：");
+		JLabel user = new JLabel("操作者："+manager);
 		user.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		bottom.add(user);
 		
@@ -100,6 +146,66 @@ public class Index extends JFrame {
 		time.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		bottom.add(time);
 		contentPane.add(bottom, BorderLayout.SOUTH);
+		setVisible(true);
 	}
-
+	public void myEvent(){
+		//点击管理学院菜单时
+		collegeAdd.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CollegeFrame college=new CollegeFrame(manager);
+				System.out.println("点击乐趣学院管理");
+				setVisible(false);
+				
+			}
+		});
+		//点击专业管理时
+		majorAdd.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				MajorFrame majorFrame=new MajorFrame(manager);
+				setVisible(false);
+			}
+		});
+		//点击班级管理
+		teamAdd.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				TeamFrame teamFrame=new TeamFrame(manager);
+				setVisible(false);
+				
+			}
+		});
+		//点击教师管理
+		teacherAdd.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				TeacherFrame teacherFrame=new TeacherFrame(manager);
+				setVisible(false);
+				
+			}
+		});
+		//点击学生管理
+		studentAdd.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				StudentFrame studentFrame=new StudentFrame(manager);
+				setVisible(false);
+				
+			}
+		});
+		//点击角色管理
+		roleAdd.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				setVisible(false);
+			}
+		});
+	}
 }

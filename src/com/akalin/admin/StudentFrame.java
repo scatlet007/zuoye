@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -26,12 +28,21 @@ public class StudentFrame extends JFrame {
 	private JTextField student;
 	private JTextField age;
 	private JTextField phone;
+	private JButton submit;
+	private JButton modify;
 	private JTable table;
-
+	private JMenu collegeManaer;
+	private JMenu majorManager;
+	private JMenu teamManager;
+	private JMenu teacherManager;
+	private JMenu studentManager;
+	private JMenu courseManager;
+	private JMenu roleManager;
+	private String manager;
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -42,12 +53,16 @@ public class StudentFrame extends JFrame {
 				}
 			}
 		});
-	}
+	}*/
 
 	/**
 	 * Create the frame.
 	 */
-	public StudentFrame() {
+	public StudentFrame(String username) {
+		manager=username;
+		init();
+	}
+	public void init(){
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100,900, 600);
 		this.setLocationRelativeTo(null);
@@ -64,25 +79,25 @@ public class StudentFrame extends JFrame {
 		JMenuBar menuBar = new JMenuBar();
 		panel.add(menuBar);
 		
-		JMenu collegeManaer = new JMenu("学院管理");
+		collegeManaer = new JMenu("学院管理");
 		menuBar.add(collegeManaer);
 		
-		JMenu majorManager = new JMenu("专业管理");
+		majorManager = new JMenu("专业管理");
 		menuBar.add(majorManager);
 		
-		JMenu teamManager = new JMenu("班级管理");
+		teamManager = new JMenu("班级管理");
 		menuBar.add(teamManager);
 		
-		JMenu teacherManager = new JMenu("教师管理");
+		teacherManager = new JMenu("教师管理");
 		menuBar.add(teacherManager);
 		
-		JMenu studentManager = new JMenu("学生管理");
+		studentManager = new JMenu("学生管理");
 		menuBar.add(studentManager);
 		
-		JMenu courseManager = new JMenu("课程管理");
+		courseManager = new JMenu("课程管理");
 		menuBar.add(courseManager);
 		
-		JMenu roleManager = new JMenu("角色管理");
+		roleManager = new JMenu("角色管理");
 		menuBar.add(roleManager);
 		
 		JLabel name = new JLabel("学生名：");
@@ -136,7 +151,7 @@ public class StudentFrame extends JFrame {
 		role.addItem("bb");
 		contentPane.add(role);
 		
-		JButton submit = new JButton("提交");
+		submit = new JButton("提交");
 		submit.setBounds(280, 104, 93, 23);
 		contentPane.add(submit);
 		
@@ -164,7 +179,7 @@ public class StudentFrame extends JFrame {
 		welcome.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		panel_1.add(welcome);
 		
-		JLabel ctrl = new JLabel("使用者：");
+		JLabel ctrl = new JLabel("使用者："+manager);
 		ctrl.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		panel_1.add(ctrl);
 		
@@ -175,6 +190,23 @@ public class StudentFrame extends JFrame {
 		JLabel time = new JLabel("时间：");
 		time.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		panel_1.add(time);
+	}
+	
+	public void myEvent(){
+		submit.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
+		modify.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
 	}
 
 }
