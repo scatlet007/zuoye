@@ -117,9 +117,12 @@ public class DAO {
 			if(conn.getConnection()){
 				conn.getState();
 				ResultSet set=conn.getStatement().executeQuery(sql);//÷¥––sql”Ôæ‰
+				int c=0;
 				while(set.next()){
-					for(int i=0;i<key.length;i++)
-						map.put(key[i], set.getString(values[i]));
+					for(int i=0;i<key.length;i++){
+						map.put(key[i]+c, set.getString(values[i]));
+					}
+					c++;
 					list.add(map);
 				}
 				set.close();

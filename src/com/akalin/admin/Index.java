@@ -1,6 +1,8 @@
 package com.akalin.admin;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -14,6 +16,10 @@ import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.Timer;
+
+import com.akalin.tool.GetDate;
+import com.akalin.tool.GetTime;
 
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -22,6 +28,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Index extends JFrame {
 
@@ -45,6 +53,7 @@ public class Index extends JFrame {
 	private JMenuItem courseAdd;
 	private JMenuItem roleAdd;
 	private String manager;
+	private BackPanel backPanel;
 	/**
 	 * Launch the application.
 	 */
@@ -71,6 +80,7 @@ public class Index extends JFrame {
 	}
 	
 	public void init(){
+		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100,100,675, 450);
 		this.setLocationRelativeTo(null);//窗口在屏幕中间显示
@@ -123,8 +133,10 @@ public class Index extends JFrame {
 		roleManager.add(roleAdd);
 		
 		//添加背景
-		BackPanel backPanel=new BackPanel(675,350);
-		contentPane.add(backPanel,BorderLayout.CENTER);
+		double panelWidth = 675;  
+		double panelHeight =450- 25 - 25 - 20;//(两个25是内外两个窗口标题栏的高度,20是底部更新进度栏的高度)  
+		backPanel=new BackPanel(panelWidth,panelHeight,"/res/loginImg.jpg");
+		contentPane.add(backPanel,-1);
 		
 		JPanel bottom = new JPanel();
 		bottom.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
@@ -138,13 +150,16 @@ public class Index extends JFrame {
 		user.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		bottom.add(user);
 		
-		JLabel data = new JLabel("日期");
+		GetDate getdata=new GetDate();
+		JLabel data = new JLabel("日期："+getdata.getDateString());
 		data.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		bottom.add(data);
 		
-		JLabel time = new JLabel("现在的时间：");
+		GetTime getTime=new GetTime();
+		JLabel time = new JLabel("现在的时间是："+getTime.getTime());
 		time.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		bottom.add(time);
+		this.setTimer(time);
 		contentPane.add(bottom, BorderLayout.SOUTH);
 		setVisible(true);
 	}
@@ -164,7 +179,7 @@ public class Index extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				MajorFrame majorFrame=new MajorFrame(manager);
+				Major majorFrame=new Major(manager);
 				setVisible(false);
 			}
 		});
@@ -203,9 +218,36 @@ public class Index extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				RoleFrame roleFrame=new RoleFrame(manager);
 				setVisible(false);
 			}
 		});
 	}
+	/** 
+     * 监听最外层窗口的resize事件,并根据新的窗口大小来调整背景图片的尺寸 
+     * @param evt 
+     */  
+    private void formComponentResized(java.awt.event.ComponentEvent evt) {                                        
+        // TODO add your handling code here:  
+        try{  
+            this.contentPane.remove(backPanel);  
+        }catch(Exception e){  
+        }  
+        backPanel = null;  
+        Dimension newSize = evt.getComponent().getSize();  
+        backPanel = new BackPanel(newSize.getWidth(),newSize.getHeight()-70,"/res/sceen.jpg");  
+        this.contentPane.add(backPanel,-1);  
+    } 
+    //设置Timer 1000ms实现一次动作 实际是一个线程   
+    private void setTimer(JLabel time){   
+        final JLabel varTime = time;   
+        Timer timeAction = new Timer(1000, new ActionListener() {          
+  
+            public void actionPerformed(ActionEvent e) {       
+                GetTime getTime=new GetTime();  
+                varTime.setText("现在的时间是："+getTime.getTime());   
+            }      
+        });            
+        timeAction.start();        
+    }   
 }

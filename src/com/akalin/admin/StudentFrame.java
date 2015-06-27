@@ -6,6 +6,9 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -14,13 +17,25 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
+
+import com.akalin.dao.DAO;
+import com.akalin.tool.GetDate;
+import com.akalin.tool.GetTime;
+import com.akalin.tool.Message;
+import com.frames.MFixedColumnTable;
 
 public class StudentFrame extends JFrame {
 
@@ -31,14 +46,33 @@ public class StudentFrame extends JFrame {
 	private JButton submit;
 	private JButton modify;
 	private JTable table;
-	private JMenu collegeManaer;
+	private JMenu collegeManager;
 	private JMenu majorManager;
 	private JMenu teamManager;
 	private JMenu teacherManager;
 	private JMenu studentManager;
 	private JMenu courseManager;
 	private JMenu roleManager;
+	private JMenuItem collegeAdd;
+	private JMenuItem majorAdd;
+	private JMenuItem teamAdd;
+	private JMenuItem teacherAdd;
+	private JMenuItem studentAdd;
+	private JMenuItem courseAdd;
+	private JMenuItem roleAdd;
 	private String manager;
+	private List<Map<String,Object>> list;
+	private ListSelectionModel fixed;
+	private int flag=0;
+	private MFixedColumnTable aim;
+	private Vector<Vector<Object>> tableValueV;
+	private String id;
+	private JPanel panel_1;
+	private JComboBox sex;
+	private JComboBox role;
+	private JComboBox team;
+	private String teamId="";
+	private String roleId="";
 	/**
 	 * Launch the application.
 	 */
@@ -61,6 +95,8 @@ public class StudentFrame extends JFrame {
 	public StudentFrame(String username) {
 		manager=username;
 		init();
+		initData();
+		myEvent();
 	}
 	public void init(){
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -79,8 +115,8 @@ public class StudentFrame extends JFrame {
 		JMenuBar menuBar = new JMenuBar();
 		panel.add(menuBar);
 		
-		collegeManaer = new JMenu("学院管理");
-		menuBar.add(collegeManaer);
+		collegeManager = new JMenu("学院管理");
+		menuBar.add(collegeManager);
 		
 		majorManager = new JMenu("专业管理");
 		menuBar.add(majorManager);
@@ -100,6 +136,20 @@ public class StudentFrame extends JFrame {
 		roleManager = new JMenu("角色管理");
 		menuBar.add(roleManager);
 		
+		collegeAdd=new JMenuItem("学院添加");
+		collegeManager.add(collegeAdd);
+		majorAdd=new JMenuItem("专业添加");
+		majorManager.add(majorAdd);
+		teamAdd=new JMenuItem("班级添加"); 
+		teamManager.add(teamAdd);
+		teacherAdd=new JMenuItem("教师添加");
+		teacherManager.add(teacherAdd);
+		studentAdd=new JMenuItem("学生添加");
+		courseAdd=new JMenuItem("课程添加");
+		courseManager.add(courseAdd);
+		studentManager.add(studentAdd);
+		roleAdd=new JMenuItem("角色添加");
+		roleManager.add(roleAdd);
 		JLabel name = new JLabel("学生名：");
 		name.setFont(new Font("宋体", Font.PLAIN, 14));
 		name.setBounds(10, 58, 56, 15);
@@ -115,7 +165,7 @@ public class StudentFrame extends JFrame {
 		college.setBounds(218, 58, 69, 15);
 		contentPane.add(college);
 		
-		JComboBox team = new JComboBox();
+		team = new JComboBox();
 		team.setModel(new DefaultComboBoxModel(new String[] {"信工学院","软件学院","文学院"}));
 		team.setBounds(297, 55, 152, 21);
 		contentPane.add(team);
@@ -125,7 +175,7 @@ public class StudentFrame extends JFrame {
 		sex1.setBounds(471, 61, 54, 15);
 		contentPane.add(sex1);
 		
-		JComboBox sex = new JComboBox();
+		sex = new JComboBox();
 		sex.setModel(new DefaultComboBoxModel(new String[] {"男","女"}));
 		sex.setBounds(516, 55, 64, 21);
 		contentPane.add(sex);
@@ -145,7 +195,7 @@ public class StudentFrame extends JFrame {
 		role1.setBounds(12, 108, 66, 15);
 		contentPane.add(role1);
 		
-		JComboBox role = new JComboBox();
+		role = new JComboBox();
 		role.setBounds(88, 105, 116, 21);
 		role.addItem("aa");
 		role.addItem("bb");
@@ -154,59 +204,277 @@ public class StudentFrame extends JFrame {
 		submit = new JButton("提交");
 		submit.setBounds(280, 104, 93, 23);
 		contentPane.add(submit);
-		
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 143, 864, 369);
-		contentPane.add(scrollPane);
-		
-		table = new JTable();
-		table.setModel(new DefaultTableModel(
-			new Object[][] {
-			},
-			new String[] {
-				"序号", "学生名", "性别", "年龄", "手机号码", "职位", "班级", "角色"
+		JPanel mainData = new JPanel();
+		mainData.setBounds(10, 188, 864, 317);
+		contentPane.add(mainData);
+		mainData.setLayout(new BorderLayout(0, 0));
+		//复制 start
+		Vector<String> columnNameV=new Vector<String>();	//创建列名向量
+		columnNameV.add("序号");
+		columnNameV.add("姓名");
+		columnNameV.add("性别");
+		columnNameV.add("年龄");
+		columnNameV.add("手机号");
+		columnNameV.add("职位");
+		columnNameV.add("班级");
+		columnNameV.add("角色");
+													
+		tableValueV=new Vector<Vector<Object>>();//创建数据向量
+		for(int row=1;row<30;row++){
+			Vector<Object> rowV=new Vector<Object>();				//创建行向量
+			rowV.add(row);
+			for(int cov=0;cov<7;cov++){
+				rowV.add("+");
 			}
-		));
-		table.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
-		scrollPane.setViewportView(table);
+			tableValueV.add(rowV);									//把行向量添加到数据向量
+		}
+		//创建面板，在该面板中实现带行标题栏的表格
+		aim=new MFixedColumnTable(columnNameV, tableValueV, 1);
+		aim.setBorder(new EmptyBorder(50, 50, 10, 50));
+		mainData.add(aim, BorderLayout.CENTER);
+		JTable f=aim.getFixedColumnTable();
+		TableColumnModel c=aim.getFloatingColumnTable().getColumnModel();
+		fixed=f.getSelectionModel();
+		fixed.addListSelectionListener(new MyListener());
+		//复制 end
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBounds(0, 536, 874, 26);
 		contentPane.add(panel_1);
 		panel_1.setLayout(new GridLayout(1,4));
 		
-		JLabel welcome = new JLabel("\u6B22\u8FCE\u5149\u4E34");
+		JLabel welcome = new JLabel("欢迎光临");
 		welcome.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		panel_1.add(welcome);
 		
 		JLabel ctrl = new JLabel("使用者："+manager);
-		ctrl.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
+		ctrl.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));   
 		panel_1.add(ctrl);
 		
-		JLabel date = new JLabel("日期：");
-		date.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
-		panel_1.add(date);
+		GetDate getdata=new GetDate();
+		JLabel data = new JLabel("日期："+getdata.getDateString());
+		data.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
+		panel_1.add(data);
 		
-		JLabel time = new JLabel("时间：");
+		GetTime getTime=new GetTime();
+		JLabel time = new JLabel("现在的时间是："+getTime.getTime());
 		time.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		panel_1.add(time);
+		this.setTimer(time);
+		
+		modify = new JButton("修改");
+		modify.setBounds(471, 104, 93, 23);
+		contentPane.add(modify);
 	}
 	
 	public void myEvent(){
+		//点击管理学院菜单时
+				collegeAdd.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						CollegeFrame college=new CollegeFrame(manager);
+						System.out.println("点击乐趣学院管理");
+						setVisible(false);
+						
+					}
+				});
+				//点击专业管理时
+				majorAdd.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						Major majorFrame=new Major(manager);
+						setVisible(false);
+					}
+				});
+				//点击班级管理
+				teamAdd.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						TeamFrame teamFrame=new TeamFrame(manager);
+						setVisible(false);
+						
+					}
+				});
+				//点击教师管理
+				teacherAdd.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						TeacherFrame teacherFrame=new TeacherFrame(manager);
+						setVisible(false);
+						
+					}
+				});
+				//点击学生管理
+				studentAdd.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						StudentFrame studentFrame=new StudentFrame(manager);
+						setVisible(false);
+						
+					}
+				});
+				//点击角色管理
+				roleAdd.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						RoleFrame roleFrame=new RoleFrame(manager);
+						setVisible(false);
+					}
+				});
+		DAO dao=new DAO();
+		String[] str={"id"};
+		List<List<Object>> tl=dao.query("select id from team where name='"+team.getSelectedItem()+"';", str);
+		for(List<Object> l:tl){
+			teamId=(String)l.get(0);
+		}
+		List<List<Object>> rl=dao.query("select id from role where name='"+role.getSelectedItem()+"';", str);
+		for(List<Object> l:tl){
+			roleId=(String)l.get(0);
+		}
 		submit.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				DAO dao=new DAO();
+				String sql="insert into student(id,name,password,sex,age,teamId,roleId)"
+						+ "values('"+createId()+"','"+student.getText()+"','123456','"+sex.getSelectedItem()+"','"+age.getText()+"',"
+								+ "'"+teamId+"','"+roleId+"')";
+				if(teamId==null||teamId.equals("")){
+					Message message=new Message("班级为空，请添加相应班级！");
+					message.pack();
+				}else{
+					if(dao.add(sql)==1){
+						Message message=new Message("添加成功！");
+						message.pack();
+						update();
+					}
+				}
 			}
 		});
 		modify.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				DAO dao=new DAO();
+				String sql="update student set name='"+student.getText()+"',sex='"+sex.getSelectedItem()+"',"
+						+ "age='"+age.getText()+"',teamId='"+teamId+"',roleId='"+roleId+"' where id='"+id+"'";
+				if(dao.modify(sql)==1){
+					Message message=new Message("修改成功！");
+					message.pack();
+					update();
+				}
 			}
 		});
 	}
-
+	//初始化数据
+	public void initData(){
+		DAO dao=new DAO();
+		String[] key={"编号","学生名","性别","年龄","角色","班级","职位"};
+		String[] values={"id","student.name","sex","age","role.name","team.name","position"};
+		list=dao.query("select student.id,student.name,sex,age,role.name,team.name.position from student"
+				+ ",team,role where role.id in(select student.roleId from student where student.teamId in( select team.id from team));", values, key);
+		if(!list.isEmpty()){
+			int c=0;
+			tableValueV.clear();
+			for(int row=1;row<list.size();row++){
+				Vector<Object> rowV=new Vector<Object>();				//创建行向量
+				rowV.add(row);
+				for(Map<String,Object> m:list){
+					rowV.add(m.get("编号"+c));
+					rowV.add(m.get("学生名"+c));
+					rowV.add(m.get("性别"+c));
+					rowV.add(m.get("年龄"+c));
+					rowV.add("");
+					rowV.add(m.get("职位"+c));
+					rowV.add(m.get("班级"+c));
+					rowV.add(m.get("角色"+c));
+				}
+				c++;
+				tableValueV.add(rowV);									//把行向量添加到数据向量
+			}
+		}
+		String[] str={"name"};
+		List<List<Object>> tl=dao.query("select id from team;", str);
+		for(List<Object> l:tl){
+			team.addItem(l.get(0));
+		}
+		List<List<Object>> rl=dao.query("select id from role ;", str);
+		for(List<Object> l:tl){
+			role.addItem(l.get(0));
+		}
+	}
+		//选中某一行表格的数据，并将其显示在填写栏
+	private class MyListener implements ListSelectionListener{
+			int f=0;		
+		@Override
+		public void valueChanged(ListSelectionEvent e) {
+			f=aim.getFixedColumnTable().getSelectedRow();
+			Vector<Object> list=new Vector<Object>();
+			list.add(tableValueV.get(f).get(0));
+			list.add(tableValueV.get(f).get(1));
+			list.add(tableValueV.get(f).get(2));
+			list.add(tableValueV.get(f).get(3));
+			id=list.get(0).toString();
+			student.setText(list.get(1).toString());
+			age.setText(list.get(3).toString());
+					
+		}
+	}
+	//设置Timer 1000ms实现一次动作 实际是一个线程   
+	 private void setTimer(JLabel time){   
+	     final JLabel varTime = time;   
+	     Timer timeAction = new Timer(1000, new ActionListener() {          
+	  
+	         public void actionPerformed(ActionEvent e) {       
+	             GetTime getTime=new GetTime();  
+	             varTime.setText("现在的时间是："+getTime.getTime());   
+	         }      
+	        });            
+	        timeAction.start();        
+	  } 
+	    //制作id
+	   private String createId(){
+		   DAO dao=new DAO();
+		   String[] x={"id"};
+		   List<List<Object>> list=dao.query("select Max(id) as id from student;", x);
+		   if(!list.isEmpty()){
+			   String id=list.get(0).get(0).toString();
+			   String subId=id.substring(3);
+			   return "student"+String.valueOf(Integer.parseInt(subId)+1);
+		   }else{
+			   return "student1001";
+		   }
+	   }
+	   public void update(){
+		   DAO dao=new DAO();
+			String[] key={"编号","学生名","性别","年龄","角色","班级","职位"};
+			String[] values={"id","student.name","sex","age","role.name","team.name","position"};
+			list=dao.query("select student.id,student.name,sex,age,role.name,team.name.position from student"
+					+ ",team,role where role.id in(select student.roleId from student where student.teamId in( select team.id from team));", values, key);
+			if(!list.isEmpty()){
+				int c=0;
+				tableValueV.clear();
+				for(int row=1;row<list.size();row++){
+					Vector<Object> rowV=new Vector<Object>();				//创建行向量
+					rowV.add(row);
+					for(Map<String,Object> m:list){
+						rowV.add(m.get("编号"+c));
+						rowV.add(m.get("学生名"+c));
+						rowV.add(m.get("性别"+c));
+						rowV.add(m.get("年龄"+c));
+						rowV.add("");
+						rowV.add(m.get("职位"+c));
+						rowV.add(m.get("班级"+c));
+						rowV.add(m.get("角色"+c));
+					}
+					c++;
+					tableValueV.add(rowV);									//把行向量添加到数据向量
+				}
+			}
+	   }
 }

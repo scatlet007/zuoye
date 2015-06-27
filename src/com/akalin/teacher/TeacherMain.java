@@ -6,6 +6,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -16,6 +17,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableColumnModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -25,8 +27,13 @@ import javax.swing.JMenuItem;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.Timer;
 
 import com.akalin.dao.Conn;
+import com.akalin.dao.DAO;
+import com.akalin.main.Login;
+import com.akalin.tool.GetDate;
+import com.akalin.tool.GetTime;
 import com.akalin.tool.Message;
 import com.frames.MFixedColumnTable;
 
@@ -66,7 +73,10 @@ public class TeacherMain extends JFrame {
 	private List<Map<String,Object>> list;
 	private ListSelectionModel fixed;
 	private int flag=0;
-	private final MFixedColumnTable mainData;
+	private MFixedColumnTable aim;
+	private Vector<Vector<Object>> tableValueV;
+	private String manager;
+	private JComboBox course;
 	/**
 	 * Launch the application.
 	 */
@@ -82,11 +92,17 @@ public class TeacherMain extends JFrame {
 			}
 		});
 	}
-
+	
 	/**
 	 * Create the frame.
 	 */
 	public TeacherMain(String username) {
+		manager=username;
+		init();
+		initData();
+		myEvent();
+	}
+	public void init(){
 		setTitle("教师主界面");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 900, 600);
@@ -106,12 +122,6 @@ public class TeacherMain extends JFrame {
 		JMenu start = new JMenu("开始");
 		menuBar.add(start);
 		
-		output = new JMenuItem("导出Excel");
-		start.add(output);
-		
-		checkCourse = new JMenuItem("查看课表");
-		start.add(checkCourse);
-		
 		logout = new JMenuItem("退出");
 		start.add(logout);
 		
@@ -126,30 +136,6 @@ public class TeacherMain extends JFrame {
 		
 		team = new JMenuItem("班级");
 		screen.add(team);
-		
-		JMenu view = new JMenu("视图");
-		menuBar.add(view);
-		
-		pie = new JMenuItem("饼形图");
-		view.add(pie);
-		
-		diagram = new JMenuItem("柱形图");
-		view.add(diagram);
-		
-		JMenu function = new JMenu("函数");
-		menuBar.add(function);
-		
-		setFuntion = new JMenuItem("自定义函数");
-		function.add(setFuntion);
-		
-		selectFuntion = new JMenuItem("选择函数");
-		function.add(selectFuntion);
-		
-		JMenu help = new JMenu("帮助");
-		menuBar.add(help);
-		
-		about = new JMenuItem("关于");
-		help.add(about);
 		
 		JPanel topCenter=new JPanel();//存放浮动式组件
 		contentPane.add(topCenter, BorderLayout.CENTER);
@@ -176,7 +162,7 @@ public class TeacherMain extends JFrame {
 		columnNameV.add("绩点");
 		columnNameV.add("取得绩点");
 				
-		Vector<Vector<Object>> tableValueV=new Vector<Vector<Object>>();//创建数据向量
+		tableValueV=new Vector<Vector<Object>>();//创建数据向量
 		for(int row=0;row<31;row++){
 			Vector<Object> rowV=new Vector<Object>();				//创建行向量
 			rowV.add(row);
@@ -186,10 +172,11 @@ public class TeacherMain extends JFrame {
 			tableValueV.add(rowV);									//把行向量添加到数据向量
 		}
 		//创建面板，在该面板中实现带行标题栏的表格
-		mainData=new MFixedColumnTable(columnNameV, tableValueV, 1);
-		mainData.setBorder(new EmptyBorder(20, 20, 20, 20));
-		topCenter.add(mainData, BorderLayout.CENTER);		//把面板添加到窗体中央
-		JTable f=mainData.getFixedColumnTable();
+		aim=new MFixedColumnTable(columnNameV, tableValueV, 1);
+		aim.setBorder(new EmptyBorder(20, 20, 20, 20));
+		topCenter.add(aim, BorderLayout.CENTER);		//把面板添加到窗体中央
+		JTable f=aim.getFixedColumnTable();
+		TableColumnModel c=aim.getFloatingColumnTable().getColumnModel();
 		fixed=f.getSelectionModel();
 		fixed.addListSelectionListener(new MyListener());
 		//复制 end
@@ -264,46 +251,45 @@ public class TeacherMain extends JFrame {
 		footPanel.add(bottom, BorderLayout.SOUTH);
 		bottom.setLayout(new GridLayout(1,6));
 		
-		JLabel welcome = new JLabel("欢迎使用");
+		JLabel welcome = new JLabel("欢迎光临");
 		welcome.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		bottom.add(welcome);
 		
-		JLabel user = new JLabel("操作者：");
-		user.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
-		bottom.add(user);
+		JLabel ctrl = new JLabel("使用者："+manager);
+		ctrl.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));   
+		bottom.add(ctrl);
 		
-		JLabel data = new JLabel("日期");
+		GetDate getdata=new GetDate();
+		JLabel data = new JLabel("日期："+getdata.getDateString());
 		data.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		bottom.add(data);
 		
-		JLabel time = new JLabel("现在的时间：");
+		GetTime getTime=new GetTime();
+		JLabel time = new JLabel("现在的时间是："+getTime.getTime());
 		time.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		bottom.add(time);
+		this.setTimer(time);
 	}
-	
+	//设置Timer 1000ms实现一次动作 实际是一个线程   
+		 private void setTimer(JLabel time){   
+		     final JLabel varTime = time;   
+		     Timer timeAction = new Timer(1000, new ActionListener() {          
+		  
+		         public void actionPerformed(ActionEvent e) {       
+		             GetTime getTime=new GetTime();  
+		             varTime.setText("现在的时间是："+getTime.getTime());   
+		         }      
+		        });            
+		        timeAction.start();        
+		  } 
 	public void myEvent(){
-		//导出excel(预留)
-		output.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				
-			}
-		});
-		//查看课表
-		checkCourse.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				
-			}
-		});
 		//退出登录
 		logout.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				Login login=new Login();
+				setVisible(false);
 			}
 		});
 		//筛选方式为成绩
@@ -311,7 +297,36 @@ public class TeacherMain extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				DAO dao=new DAO();
+				String key[]={"学号","名字","课程","学分","课程分类","考核方式","成绩","班级"};
+				String values[]={"student.id","student.name","course.name","credit","ctype","ctype2","score","team.name"};
+				String sql="select student.id,student.name,course.name,credit,ctype,ctype2,score,team.name "
+						+ "from student,grade,team "
+						+ "where team.id in(select student.teamId from student where student.id in(select team_course.sno from grade group by grade having score'"+condition.getText()+"'))"
+								+ "and course.id=grade.id and student.id=grade.studentId";
+				List<Map<String,Object>> list=dao.query(sql, values, key);
+				if(!list.isEmpty()){
+					tableValueV.clear();
+					int c=0;
+					for(int row=1;row<list.size();row++){
+						Vector<Object> rowV=new Vector<Object>();				//创建行向量
+						for(Map<String,Object> m:list){
+							rowV.add(m.get("学号"+c));
+							rowV.add(m.get("名字"+c));
+							rowV.add(m.get("课程"+c));
+							rowV.add(m.get("学分"+c));
+							rowV.add(m.get("课程分类"+c));
+							rowV.add(m.get("考核方式"+c));
+							rowV.add(m.get("成绩"+c));
+							rowV.add(m.get("学分"+c));
+							rowV.add(calCredit((int)m.get("成绩"+c)));
+							rowV.add(calCredit((int)m.get("成绩"+c))+(int)m.get("学分"+c));
+							rowV.add(m.get("班级"+c));
+						}
+						c++;
+						tableValueV.add(rowV);									//把行向量添加到数据向量
+					}
+				}
 			}
 		});
 		//筛选方式为学分
@@ -319,7 +334,36 @@ public class TeacherMain extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				DAO dao=new DAO();
+				String key[]={"学号","名字","课程","学分","课程分类","考核方式","成绩","班级"};
+				String values[]={"student.id","student.name","course.name","credit","ctype","ctype2","score","team.name"};
+				String sql="select student.id,student.name,course.name,credit,ctype,ctype2,score,team.name "
+						+ "from student,grade,team "
+						+ "where team.id in(select student.teamId from student where student.id in(select grade.studentId from grade group by grade having score '"+(Integer.parseInt(condition.getText())*10+50)+"'))"
+								+ "and course.id=grade.id and student.id=grade.studentId";
+				List<Map<String,Object>> list=dao.query(sql, values, key);
+				if(!list.isEmpty()){
+					tableValueV.clear();
+					int c=0;
+					for(int row=1;row<list.size();row++){
+						Vector<Object> rowV=new Vector<Object>();				//创建行向量
+						for(Map<String,Object> m:list){
+							rowV.add(m.get("学号"+c));
+							rowV.add(m.get("名字"+c));
+							rowV.add(m.get("课程"+c));
+							rowV.add(m.get("学分"+c));
+							rowV.add(m.get("课程分类"+c));
+							rowV.add(m.get("考核方式"+c));
+							rowV.add(m.get("成绩"+c));
+							rowV.add(m.get("学分"+c));
+							rowV.add(calCredit((int)m.get("成绩"+c)));
+							rowV.add(calCredit((int)m.get("成绩"+c))+(int)m.get("学分"+c));
+							rowV.add(m.get("班级"+c));
+						}
+						c++;
+						tableValueV.add(rowV);									//把行向量添加到数据向量
+					}
+				}
 			}
 		});
 		
@@ -328,47 +372,44 @@ public class TeacherMain extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
-			}
-		});
-		//饼形图(预留)
-		pie.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				
-			}
-		});
-		//柱形图(预留)
-		diagram.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				
-			}
-		});
-		//自定义函数设置
-		setFuntion.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				
-			}
-		});
-		//选择函数
-		selectFuntion.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				
-			}
-		});
-		//点击了关于按钮
-		about.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				
+				DAO dao=new DAO();
+				String[] str={"id,name"};
+				String teamId="";
+				String team="";
+				List<List<Object>> teams=dao.query("select id,name from where name='"+condition.getText()+"'", str);
+				if(!teams.isEmpty()&&teams.size()>0){
+					teamId=(String)teams.get(0).get(0);
+					team=(String)teams.get(0).get(1);
+					List<List<Object>> students=dao.query("select id,name from student where teamId='"+teamId+"'", str);
+					for(List<Object> ss:students){
+						String key[]={"课程","学分","课程分类","考核方式","成绩"};
+						String values[]={"name","credit","ctype","ctype2","score"};
+						String sql="select name,credit,ctype,ctype2,score from course,grade where course.id=grade.courseId and grade.studentId='"+ss.get(0)+"'";
+						List<Map<String,Object>> list=dao.query(sql, values, key);
+						if(!list.isEmpty()){
+							tableValueV.clear();
+							int c=0;
+							for(int row=1;row<list.size();row++){
+								Vector<Object> rowV=new Vector<Object>();				//创建行向量
+								for(Map<String,Object> m:list){
+									rowV.add(ss.get(0));
+									rowV.add(ss.get(1));
+									rowV.add(m.get("课程"+c));
+									rowV.add(m.get("学分"+c));
+									rowV.add(m.get("课程分类"+c));
+									rowV.add(m.get("考核方式"+c));
+									rowV.add(m.get("成绩"+c));
+									rowV.add(m.get("学分"+c));
+									rowV.add(calCredit((int)m.get("成绩"+c)));
+									rowV.add(calCredit((int)m.get("成绩"+c))+(int)m.get("学分"+c));
+									rowV.add(team);
+								}
+								c++;
+								tableValueV.add(rowV);									//把行向量添加到数据向量
+							}
+					}
+				}
+				}
 			}
 		});
 		//点击了提交按钮
@@ -376,21 +417,7 @@ public class TeacherMain extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Conn conn=new Conn();
-				if(conn.getConnection()){
-					conn.getState();
-					String sql="";//请填写插入的sql语句
-					try {
-						conn.getStatement().executeQuery(sql);
-					} catch (SQLException e1) {
-						e1.printStackTrace();
-					}
-					conn.close();
-				}else{
-					Message message=new Message("网络错误，无法连接到数据库");
-					message.pack();
-					conn.close();
-				}
+				
 			}
 		});
 		//点击了修改按钮
@@ -398,39 +425,88 @@ public class TeacherMain extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Conn conn=new Conn();
-				if(conn.getConnection()){
-					conn.getState();
-					String sql="";//请填写插入的sql语句
-					try {
-						conn.getStatement().executeQuery(sql);
-					} catch (SQLException e1) {
-						e1.printStackTrace();
-					}
-					conn.close();
-				}else{
-					Message message=new Message("网络错误，无法连接到数据库");
-					message.pack();
-					conn.close();
-				}
 			}
 		});
 	}
+	 //制作id
+	   private String createId(){
+		   DAO dao=new DAO();
+		   String[] x={"id"};
+		   List<List<Object>> list=dao.query("select Max(id) as id from team_course;", x);
+		   if(!list.isEmpty()){
+			   String id=list.get(0).get(0).toString();
+			   String subId=id.substring(2);
+			   return "sc"+String.valueOf(Integer.parseInt(subId)+1);
+		   }else{
+			   return "sc1001";
+		   }
+	   }
+	public void initData(){
+		String[] str={"id"};
+		DAO dao=new DAO();
+		List<List<Object>> teacherId=dao.query("select id from teacher where name='"+manager+"'", str);
+		String[] s1={"teamId","courseId"};
+		List<List<Object>> ss=dao.query("select teamId,courseId fromteam_course where teacherId='"+teacherId.get(0).get(0)+"'", s1);
+		for(List<Object> ls:ss){
+			String[] sc={"student.id","student.name","course.name","credit","ctype","ctype2","score","team.name"};
+			String sql="select student.id,student.name,course.name,credit,ctype,ctype2,score"
+					+ "from student,course,grade,team"
+					+ "where student.is=grade.studentId and course.id='"+ls.get(1)+"' and team.name='"+ls.get(0)+"' and grade.courseId=course.id and student.teamId=team.id";
+			List<List<Object>> sc2=dao.query(sql, str);
+		}
+	}
+	public void update(){
+		DAO dao=new DAO();
+		String key[]={"学号","名字","课程","学分","课程分类","考核方式","成绩","班级"};
+		String values[]={"student.id","student.name","course.name","credit","ctype","ctype2","score","team.name"};
+		String sql="select student.id,student.name,course.name,credit,ctype,ctype2,score,team.name "
+				+ "from student,course,team,grade "
+				+ "where team.id in(select student.teamId from student where student.id in(select grade.studentId from grade)) and student.id=grade.studentId and grade.courseId=course.id";
+		List<Map<String,Object>> list=dao.query(sql, values, key);
+		if(!list.isEmpty()){
+			tableValueV.clear();
+			int c=0;
+			for(int row=1;row<list.size();row++){
+				Vector<Object> rowV=new Vector<Object>();				//创建行向量
+				for(Map<String,Object> m:list){
+					rowV.add(m.get("学号"+c));
+					rowV.add(m.get("名字"+c));
+					rowV.add(m.get("课程"+c));
+					rowV.add(m.get("学分"+c));
+					rowV.add(m.get("课程分类"+c));
+					rowV.add(m.get("考核方式"+c));
+					rowV.add(m.get("成绩"+c));
+					rowV.add(m.get("学分"+c));
+					rowV.add(calCredit((int)m.get("成绩"+c)));
+					rowV.add(calCredit((int)m.get("成绩"+c))+(int)m.get("学分"+c));
+					rowV.add(m.get("班级"+c));
+				}
+				c++;
+				tableValueV.add(rowV);									//把行向量添加到数据向量
+			}
+		}
+	}
+	//
+	private double calCredit(int x){
+		return (x-60+10)/10;
+	}
 	//选中某一行表格的数据，并将其显示在填写栏
 		private class MyListener implements ListSelectionListener{
-			int i=0;
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				if(flag!=mainData.getSelectRow()){
-					List<Vector<Object>> list=mainData.getList();
-					for(Vector<Object> vec:list){
-						sno.setText(vec.get(0).toString());
-						sname.setText(vec.get(1).toString());
-						grade.setText(vec.get(6).toString());
-					}
-					flag=mainData.getSelectRow();
-				}
-			}
-			
+				int f=0;
+				@Override
+				public void valueChanged(ListSelectionEvent e) {
+					f=aim.getFixedColumnTable().getSelectedRow();
+					Vector<Object> list=new Vector<Object>();
+					list.add(tableValueV.get(f).get(0));
+					list.add(tableValueV.get(f).get(1));
+					list.add(tableValueV.get(f).get(2));
+					list.add(tableValueV.get(f).get(3));
+					list.add(tableValueV.get(f).get(4));
+					list.add(tableValueV.get(f).get(5));
+					list.add(tableValueV.get(f).get(6));
+					sno.setText(list.get(0).toString());
+					sname.setText(list.get(1).toString());
+					grade.setText(list.get(6).toString());		
+				}	
 		}
 }

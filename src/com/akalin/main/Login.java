@@ -1,30 +1,34 @@
 package com.akalin.main;
 
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.swing.ButtonGroup;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.text.html.ImageView;
 
+import com.akalin.admin.BackPanel;
 import com.akalin.admin.Index;
-import com.akalin.dao.Conn;
 import com.akalin.dao.DAO;
 import com.akalin.teacher.TeacherMain;
 import com.akalin.tool.Message;
 import com.akalin.userframe.StudentMain;
-import com.akalin.userframe.StudentRegister;
 
 public class Login extends JFrame {
 	
@@ -32,7 +36,6 @@ public class Login extends JFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 8894157331136913733L;
-	private JFrame jf;				//窗体
 	private JComboBox<String> role;	//角色下拉列表框
 	private JLabel name;			//用户名标签
 	private JLabel pwd;				//密码标签
@@ -42,59 +45,65 @@ public class Login extends JFrame {
 	private JRadioButton register;	//注册链接
 	private JRadioButton forget;	//忘记密码链接
 	private JButton reset;			//顶部图片
-	private String roleName;
+	private String roleName="教师";
+	private BackPanel backPanel;
+	//private JPanel contentPane;
+	
 	public Login(){
 		init();
 		if(checkRole()==0)
 			initRole();
 		initTeacher();
 	}
-	
-	/**
-	 * 初始化窗体
-	 */
 	public void init(){
-		jf=new JFrame();
-		jf.setBounds(100, 100, 450, 300);
-		jf.setLocationRelativeTo(null);
-		jf.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		JPanel main=new JPanel();	//主框架面板
-		main.setLayout(null);//面板布局
+		setResizable(false);
+		setBounds(100, 100, 450, 300);
+		this.setLocationRelativeTo(null);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		JPanel contentPane = new JPanel();	//主框架面板
+		contentPane.setLayout(null);//面板布局
+		setContentPane(contentPane);
 		role=new JComboBox<String>();
 		role.addItem("教师");
-		role.addItem("学生");
 		role.addItem("管理员");
 		role.setBounds(160, 50, 100, 24);
-		main.add(role);
+		contentPane.add(role);
 		name=new JLabel("用户名:");
 		name.setBounds(100, 94, 60, 24);
-		main.add(name);
+		contentPane.add(name);
 		username=new JTextField(24);
 		username.setBounds(162, 94, 160, 24);
-		main.add(username);
+		contentPane.add(username);
 		pwd=new JLabel("密码:");
 		pwd.setBounds(110, 128, 60, 24);
-		main.add(pwd);
+		contentPane.add(pwd);
 		password=new JTextField(24);
 		password.setBounds(162, 128, 160, 24);
-		main.add(password);
-		register=new JRadioButton("注册");
+		contentPane.add(password);
+		/*register=new JRadioButton("注册");
 		forget=new JRadioButton("忘记密码");
 		register.setBounds(162, 162, 70, 24);
 		forget.setBounds(234, 162, 90, 24);
 		main.add(register);
-		main.add(forget);
+		main.add(forget);*/
 		ButtonGroup group=new ButtonGroup();
 		group.add(register);
 		group.add(forget);
-		submit=new JButton("登录");
-		submit.setBounds(162, 196, 60, 24);
-		main.add(submit);
+		ImageIcon img=new ImageIcon("/res/icon/loginbtn.png");
+		submit=new JButton("提交",img);
+		submit.setContentAreaFilled(false);;
+		submit.setBounds(162, 162,70,24);
+		//submit.setIcon(UIConfig.getImgUrl("常用交易字.png"));
+		contentPane.add(submit);
 		reset=new JButton("重置");
-		reset.setBounds(234, 196, 60, 24);
-		main.add(reset);
-		jf.add(main);
-		jf.setVisible(true);
+		reset.setBounds(234, 162, 70, 24);
+		contentPane.add(reset);
+		
+		double panelWidth = Toolkit.getDefaultToolkit().getScreenSize().getWidth();  
+		double panelHeight =Toolkit.getDefaultToolkit().getScreenSize().getHeight()- 25 - 25 - 20;//(两个25是内外两个窗口标题栏的高度,20是底部更新进度栏的高度)  
+		backPanel=new BackPanel(panelWidth,panelHeight,"/res/sceen.jpg");
+		contentPane.add(backPanel, -1);
+		setVisible(true);
 	}
 	
 	/**
@@ -155,7 +164,7 @@ public class Login extends JFrame {
 							System.out.println("www");
 							Index index=new Index(user);
 							//index.pack();
-							jf.setVisible(false);
+							setVisible(false);
 						}else{
 							list=dao.query("select * from admin where name='"+user+"'and password='"+pwds+"';", x);
 							for(List<Object> l:list){
@@ -191,26 +200,6 @@ public class Login extends JFrame {
 			}
 			
 		});
-		
-		//点击了注册选项事件
-		register.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				//请在此添加点击了注册后的代码
-				StudentRegister register=new StudentRegister();
-				register.pack();
-			}
-		});
-		
-		//点击了忘记了密码事件
-		forget.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				//请在此添加点击了忘记密码后的代码
-			}
-		});
 	}
 	public static void main(String[] args){
 		Login login=new Login();
@@ -245,4 +234,19 @@ public class Login extends JFrame {
 			dao.add(sql);
 		}
 	}
+	/** 
+     * 监听最外层窗口的resize事件,并根据新的窗口大小来调整背景图片的尺寸 
+     * @param evt 
+     */  
+    private void formComponentResized(java.awt.event.ComponentEvent evt) {                                        
+        // TODO add your handling code here:  
+        try{  
+            this.remove(backPanel);  
+        }catch(Exception e){  
+        }  
+        backPanel = null;  
+        Dimension newSize = evt.getComponent().getSize();  
+        backPanel = new BackPanel(newSize.getWidth(),newSize.getHeight()-70,"/res/sceen.jpg");  
+        this.add(backPanel,-1);  
+    }  
 }

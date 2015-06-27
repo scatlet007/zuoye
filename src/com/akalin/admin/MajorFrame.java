@@ -97,9 +97,6 @@ public class MajorFrame extends JFrame {
 		roleManager = new JMenu("角色管理");
 		menuBar.add(roleManager);
 		
-		/*//添加背景
-		BackPanel backPanel=new BackPanel(675,350);
-		contentPane.add(backPanel,BorderLayout.CENTER);*/
 		String[] columnValues={"序号","专业名","创立时间","简单描述"};
 		String[][] tableValues=new String[30][4];
 		for(int i=0;i<30;i++){

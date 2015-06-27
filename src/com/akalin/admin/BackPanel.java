@@ -9,28 +9,15 @@ import javax.swing.ImageIcon;
 
 public class BackPanel extends javax.swing.JPanel{
 	Image image;
-	int width;
-	int height;
+	private int width;
+	private int height;
 	
-	public int getWidth() {
-		return width;
-	}
-	public void setWidth(int width) {
-		this.width = width;
-	}
-	public int getHeight() {
-		return height;
-	}
-	public void setHeight(int height) {
-		this.height = height;
-	}
-	
-	public BackPanel(int width,int height){
-		URL url=BackPanel.class.getResource("/res/sceen.jpg");
+	public BackPanel(double width,double height,String imgPath){
+		URL url=BackPanel.class.getResource(imgPath);
 		image=new ImageIcon(url).getImage();
 		initComponments();
-		this.width=width;
-		this.height=height;
+		this.width=(int)width;
+		this.height=(int)height;
 	}
 	protected void paintComponent(Graphics g){
 		super.paintComponent(g);
