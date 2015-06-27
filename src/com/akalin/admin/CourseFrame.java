@@ -34,6 +34,7 @@ import com.frames.MFixedColumnTable;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -74,7 +75,7 @@ public class CourseFrame extends JFrame {
 	private JComboBox major;
 	private JComboBox type;
 	private JComboBox type2;
-	
+	private List<String> majorId;
 	/**
 	 * Create the frame.
 	 */
@@ -164,6 +165,9 @@ public class CourseFrame extends JFrame {
 		
 		type = new JComboBox();
 		type.setBounds(515, 52, 110, 21);
+		type.addItem("专业选修课");
+		type.addItem("专业必修课");
+		type.addItem("通识必修课");
 		contentPanel.add(type);
 		
 		JLabel type01 = new JLabel("考核方式：");
@@ -173,6 +177,8 @@ public class CourseFrame extends JFrame {
 		
 		type2 = new JComboBox();
 		type2.setBounds(736, 52, 99, 21);
+		type2.addItem("考查");
+		type2.addItem("考试");
 		contentPanel.add(type2);
 		
 		JLabel major1 = new JLabel("专业：");
@@ -207,7 +213,7 @@ public class CourseFrame extends JFrame {
 		for(int row=1;row<30;row++){
 			Vector<Object> rowV=new Vector<Object>();				//创建行向量
 			rowV.add(row);
-			for(int cov=0;cov<7;cov++){
+			for(int cov=0;cov<6;cov++){
 				rowV.add("+");
 			}
 			tableValueV.add(rowV);									//把行向量添加到数据向量
@@ -218,7 +224,7 @@ public class CourseFrame extends JFrame {
 		panel_1.add(mainData, BorderLayout.CENTER);		//把面板添加到窗体中央
 		JTable f=mainData.getFixedColumnTable();
 		TableColumnModel c=mainData.getFloatingColumnTable().getColumnModel();
-		c.getColumn(6).setPreferredWidth(400);
+		c.getColumn(5).setPreferredWidth(300);
 		fixed=f.getSelectionModel();
 		fixed.addListSelectionListener(new MyListener());
 		//复制 end
@@ -304,6 +310,14 @@ public class CourseFrame extends JFrame {
 						
 					}
 				});
+				courseAdd.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						CourseFrame courseFrame=new CourseFrame(manager);
+						setVisible(false);
+					}
+				});
 				//点击角色管理
 				roleAdd.addActionListener(new ActionListener() {
 					
@@ -319,9 +333,8 @@ public class CourseFrame extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				DAO dao=new DAO();
 				String[] x={"id"};
-				List<List<Object>> list=dao.query("select * from major where name='"+major.getSelectedItem()+"';", x);
 				String sql="insert into course(id,name,ctype,ctype2,credit,majorId) values"
-						+ "('"+createId()+"','"+course.getText()+"','"+type.getSelectedItem()+"','"+type2.getSelectedItem()+"',"+list.get(0).get(0)+"');";
+						+ "('"+createId()+"','"+course.getText()+"','"+type.getItemAt(type.getSelectedIndex())+"','"+type2.getItemAt(type2.getSelectedIndex())+"','"+credit.getText()+"','"+majorId.get(major.getSelectedIndex())+"');";
 				
 				if(major.getSelectedItem()==null||major.getSelectedItem().equals("")){
 					Message message=new Message("请添加相应的专业");
@@ -341,10 +354,7 @@ public class CourseFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				DAO dao=new DAO();
 				int[] x={1};
-				List<List<Object>> list=dao.query("select * from major where name='"+major.getSelectedItem()+"';", x);
-				String sql="update course set"
-						+ "name='"+course.getText()+"',ctype='"+type.getSelectedItem()+"',ctype2='"+type2.getSelectedItem()+"',majorId='"+list.get(0).get(0)+"'"
-								+ "where id='"+id+"';";
+				String sql="update course set name='"+course.getText()+"',ctype='"+type.getItemAt(type.getSelectedIndex())+"',ctype2='"+type2.getItemAt(type2.getSelectedIndex())+"',majorId='"+majorId.get(major.getSelectedIndex())+"',credit='"+credit.getText()+"' where id='"+id+"';";
 				if(dao.modify(sql)==1){
 					Message message=new Message("执行成功！");
 					message.pack();
@@ -357,8 +367,8 @@ public class CourseFrame extends JFrame {
 		public void initData(){
 			 DAO dao=new DAO();
 			   String[] key={"编号","专业名","课程名","课程分类","考核方式","学分"};
-			   String[] values={"id","major.name","course.name","ctype","ctype2"};
-				list=dao.query("select *from course;", values, key);
+			   String[] values={"course.id","major.name","course.name","ctype","ctype2","credit"};
+				list=dao.query("select course.id,major.name,course.name,ctype,ctype2,credit from course,major where course.majorId=major.id;", values, key);
 				if(!list.isEmpty()){
 					int c=0;
 					tableValueV.clear();
@@ -377,6 +387,20 @@ public class CourseFrame extends JFrame {
 						tableValueV.add(rowV);									//把行向量添加到数据向量
 					}
 				}
+				majorId=new ArrayList<String>();
+				String[] values1={"id","name"};
+				String key1[]={"id","name"};
+				List<Map<String,Object>> ls=dao.query("select id,name from major;", values1,key1);
+				if(!ls.isEmpty()){
+					int c=0;
+					major.removeAllItems();
+					for(Map<String,Object> l:ls){
+						major.addItem(l.get("name"+c));
+						majorId.add((String)l.get("id"+c));
+						System.out.println(l.get("name"+c)+"--name");
+						c++;
+					}
+				}
 		}
 	//选中某一行表格的数据，并将其显示在填写栏
 			private class MyListener implements ListSelectionListener{
@@ -389,9 +413,15 @@ public class CourseFrame extends JFrame {
 					list.add(tableValueV.get(f).get(1));
 					list.add(tableValueV.get(f).get(2));
 					list.add(tableValueV.get(f).get(3));
-					id=list.get(0).toString();
-					course.setText(list.get(1).toString());
-					credit.setText(list.get(2).toString());
+					list.add(tableValueV.get(f).get(4));
+					list.add(tableValueV.get(f).get(5));
+					list.add(tableValueV.get(f).get(6));
+					id=list.get(1).toString();
+					major.setSelectedItem(list.get(2));
+					course.setText(list.get(3).toString());
+					type.setSelectedItem(list.get(4));
+					type2.setSelectedItem(list.get(5));
+					credit.setText(list.get(6).toString());
 				}
 				
 			}
@@ -412,9 +442,9 @@ public class CourseFrame extends JFrame {
 	   DAO dao=new DAO();
 	   int[] x={1};
 	   List<List<Object>> list=dao.query("select Max(id) as id from course;", x);
-	   if(!list.isEmpty()){
+	   if(!list.isEmpty()&&list.get(0).get(0)!=null){
 		   String id=list.get(0).get(0).toString();
-		   String subId=id.substring(3);
+		   String subId=id.substring(6);
 		   return "course"+String.valueOf(Integer.parseInt(subId)+1);
 	   }else{
 		   return "course1001";
@@ -423,8 +453,8 @@ public class CourseFrame extends JFrame {
    public void update(){
 	   DAO dao=new DAO();
 	   String[] key={"编号","专业名","课程名","课程分类","考核方式","学分"};
-	   String[] values={"id","major.name","course.name","ctype","ctype2"};
-		list=dao.query("select *from course;", values, key);
+	   String[] values={"course.id","major.name","course.name","ctype","ctype2","credit"};
+		list=dao.query("select course.id,major.name,course.name,ctype,ctype2,credit from course,major where course.majorId=major.id;", values, key);
 		if(!list.isEmpty()){
 			int c=0;
 			tableValueV.clear();

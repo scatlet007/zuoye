@@ -19,6 +19,7 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.JLabel;
 
 import java.awt.Font;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -67,7 +68,6 @@ public class Major extends JFrame {
 	private String manager;
 	private JLabel majorName1;
 	private JTextField majorName;
-	private JTextField createTime;
 	private JButton submit;
 	private JButton modify;
 	private JTextArea status;
@@ -80,6 +80,8 @@ public class Major extends JFrame {
 	private JPanel panel_1;
 	private JLabel college2;
 	private JComboBox college;
+	private List<String> collegeId;
+	private JTextField createTime;
 	/**
 	 * Create the frame.
 	 */
@@ -90,8 +92,10 @@ public class Major extends JFrame {
 		myEvent();
 	}
 	public void init(){
+		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 900, 600);
+		setLocationRelativeTo(null);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -151,17 +155,6 @@ public class Major extends JFrame {
 		contentPane.add(majorName);
 		majorName.setColumns(10);
 		
-		JLabel createTime2 = new JLabel("\u521B\u5EFA\u65F6\u95F4:");
-		createTime2.setFont(new Font("黑体", Font.BOLD, 14));
-		createTime2.setBounds(304, 68, 75, 15);
-		contentPane.add(createTime2);
-		
-		createTime = new JTextField();
-		createTime.setFont(new Font("黑体", Font.BOLD, 14));
-		createTime.setBounds(389, 62, 134, 21);
-		contentPane.add(createTime);
-		createTime.setColumns(10);
-		
 		JLabel status2 = new JLabel("\u63CF\u8FF0:");
 		status2.setFont(new Font("黑体", Font.BOLD, 14));
 		status2.setBounds(54, 121, 54, 15);
@@ -200,7 +193,7 @@ public class Major extends JFrame {
 		for(int row=1;row<30;row++){
 			Vector<Object> rowV=new Vector<Object>();				//创建行向量
 			rowV.add(row);
-			for(int cov=0;cov<6;cov++){
+			for(int cov=0;cov<5;cov++){
 				rowV.add("+");
 			}
 			tableValueV.add(rowV);									//把行向量添加到数据向量
@@ -240,12 +233,21 @@ public class Major extends JFrame {
 		
 		college2 = new JLabel("\u5B66\u9662\u540D:");
 		college2.setFont(new Font("黑体", Font.BOLD, 14));
-		college2.setBounds(550, 68, 54, 15);
+		college2.setBounds(552, 65, 54, 15);
 		contentPane.add(college2);
 		
 		college = new JComboBox();
-		college.setBounds(627, 62, 134, 21);
+		college.setBounds(636, 62, 134, 21);
 		contentPane.add(college);
+		
+		JLabel lblNewLabel = new JLabel("\u521B\u5EFA\u65F6\u95F4\uFF1A");
+		lblNewLabel.setBounds(276, 65, 78, 15);
+		contentPane.add(lblNewLabel);
+		
+		createTime = new JTextField();
+		createTime.setBounds(364, 62, 123, 21);
+		contentPane.add(createTime);
+		createTime.setColumns(10);
 		setVisible(true);
 	}
 	public void myEvent(){
@@ -298,6 +300,14 @@ public class Major extends JFrame {
 						
 					}
 				});
+				courseAdd.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						CourseFrame courseFrame=new CourseFrame(manager);
+						setVisible(false);
+					}
+				});
 				//点击角色管理
 				roleAdd.addActionListener(new ActionListener() {
 					
@@ -313,7 +323,7 @@ public class Major extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				DAO dao=new DAO();
 				String sql="insert into major(id,name,createTime,collegeId,status)"
-						+ "values('"+createId()+"','"+majorName.getText()+"','"+createTime.getText()+"','"+college.getSelectedItem()+"','"+status.getText()+"')";
+						+ "values('"+createId()+"','"+majorName.getText()+"','"+createTime.getText()+"','"+collegeId.get(college.getSelectedIndex())+"','"+status.getText()+"')";
 				if(college.getSelectedItem().equals("")||college.getSelectedItem()==null){
 					Message message=new Message("学院为空，请添加相应的学院");
 					message.pack();
@@ -331,8 +341,7 @@ public class Major extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				DAO dao=new DAO();
-				String sql="update major set name='"+majorName.getText()+"',createTime='"+createTime.getText()+"',"
-						+ "collegeId='"+college.getSelectedItem()+"',status='"+status.getText()+"' where id='"+id+"'";
+				String sql="update major set name='"+majorName.getText()+"',createTime='"+createTime.getText()+"',collegeId='"+collegeId.get(college.getSelectedIndex())+"',status='"+status.getText()+"' where id='"+id+"'";
 				if(dao.modify(sql)==1){
 					Message message=new Message("修改成功！");
 					message.pack();
@@ -345,13 +354,14 @@ public class Major extends JFrame {
 	public void initData(){
 		DAO dao=new DAO();
 		String[] key={"编号","专业名","创建时间","学院","描述"};
-		String[] values={"id","major.name","major.create","college.name","major.status"};
-		list=dao.query("select major.id,major.name,major.createTime,college.name,major.status from course"
-				+ ",major where major.collegeId=college.id;", values, key);
+		String[] values={"major.id","major.name","major.createTime","college.name","major.status"};
+		list=dao.query("select major.id,major.name,major.createTime,college.name,major.status from college,major where major.collegeId=college.id", values, key);
 		if(!list.isEmpty()){
+			System.out.println("abc");
 			tableValueV.clear();
 			int c=0;
-			for(int row=1;row<list.size();row++){
+			for(int row=0;row<list.size();row++){
+				System.out.println("ab55");
 				Vector<Object> rowV=new Vector<Object>();				//创建行向量
 				rowV.add(row);
 				for(Map<String,Object> m:list){
@@ -360,16 +370,24 @@ public class Major extends JFrame {
 					rowV.add(m.get("创建时间"+c));
 					rowV.add(m.get("学院"+c));
 					rowV.add(m.get("描述"+c));
+					System.out.println("af->>>"+rowV.add(m.get("编号"+c)));
+					System.out.println("abc99");
 				}
 				c++;
 				tableValueV.add(rowV);									//把行向量添加到数据向量
 			}
 		}
-		String[] x={"id"};
-		List<List<Object>> ls=dao.query("select name from college;", x);
+		System.out.println("aaa");
+		collegeId=new ArrayList<String>();
+		String[] values1={"id","name"};
+		String key1[]={"id","name"};
+		List<Map<String,Object>> ls=dao.query("select id,name from college;", values1,key1);
 		if(!ls.isEmpty()){
-			for(List<Object> l:ls){
-				college.addItem(l.get(0));
+			int c=0;
+			for(Map<String,Object> l:ls){
+				college.addItem(l.get("name"+c));
+				collegeId.add((String)l.get("id"+c));
+				c++;
 			}
 		}
 	}
@@ -384,10 +402,12 @@ public class Major extends JFrame {
 			list.add(tableValueV.get(f).get(1));
 			list.add(tableValueV.get(f).get(2));
 			list.add(tableValueV.get(f).get(3));
-			id=list.get(0).toString();
-			majorName.setText(list.get(1).toString());
-			createTime.setText(list.get(2).toString());
-			status.setText(list.get(3).toString());			
+			list.add(tableValueV.get(f).get(4));
+			list.add(tableValueV.get(f).get(5));
+			id=list.get(1).toString();
+			majorName.setText(list.get(2).toString());
+			createTime.setText(list.get(3).toString());
+			status.setText(list.get(5).toString());			
 		}
 	}
 	//设置Timer 1000ms实现一次动作 实际是一个线程   
@@ -407,7 +427,7 @@ public class Major extends JFrame {
 		   DAO dao=new DAO();
 		   String[] x={"id"};
 		   List<List<Object>> list=dao.query("select Max(id) as id from major;", x);
-		   if(!list.isEmpty()){
+		   if(!list.isEmpty()&&list.get(0).get(0)!=null){
 			   String id=list.get(0).get(0).toString();
 			   String subId=id.substring(5);
 			   return "major"+String.valueOf(Integer.parseInt(subId)+1);
@@ -418,13 +438,14 @@ public class Major extends JFrame {
 	   public void update(){
 		   DAO dao=new DAO();
 			String[] key={"编号","专业名","创建时间","学院","描述"};
-			String[] values={"id","major.name","major.create","college.name","major.status"};
-			list=dao.query("select major.id,major.name,major.createTime,college.name,major.status from course"
-					+ ",major where major.collegeId=college.id;", values, key);
+			String[] values={"major.id","major.name","major.createTime","college.name","major.status"};
+			list=dao.query("select major.id,major.name,major.createTime,college.name,major.status from college,major where major.collegeId=college.id", values, key);
 			if(!list.isEmpty()){
-				int c=0;
+				System.out.println("abc");
 				tableValueV.clear();
-				for(int row=1;row<list.size();row++){
+				int c=0;
+				for(int row=0;row<list.size();row++){
+					System.out.println("ab55");
 					Vector<Object> rowV=new Vector<Object>();				//创建行向量
 					rowV.add(row);
 					for(Map<String,Object> m:list){
@@ -433,6 +454,8 @@ public class Major extends JFrame {
 						rowV.add(m.get("创建时间"+c));
 						rowV.add(m.get("学院"+c));
 						rowV.add(m.get("描述"+c));
+						System.out.println("af->>>"+rowV.add(m.get("编号"+c)));
+						System.out.println("abc99");
 					}
 					c++;
 					tableValueV.add(rowV);									//把行向量添加到数据向量

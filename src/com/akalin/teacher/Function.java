@@ -3,18 +3,25 @@ package com.akalin.teacher;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -22,6 +29,9 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.JTextField;
 
 import com.akalin.dao.Conn;
+import com.akalin.dao.DAO;
+import com.akalin.tool.GetDate;
+import com.akalin.tool.GetTime;
 import com.akalin.tool.Message;
 
 import javax.swing.JLabel;
@@ -37,7 +47,8 @@ public class Function extends JFrame {
 	private JLabel label3;//期中
 	private JLabel label4;//平时
 	private JLabel label5;//期末
-	private JTextField course;//课程
+	private JComboBox course;//课程
+	private JComboBox team;
 	private JTextField homework;
 	private JTextField middy;
 	private JTextField normal;
@@ -53,6 +64,11 @@ public class Function extends JFrame {
 	private MFixedColumnTable mainData;
 	private Vector<Vector<Object>> tableValueV;
 	private String manager;
+	private JButton submit;
+	private JButton modify;
+	private List<String> courseId;
+	private String teacherId="";
+	private List<String> teamId;
 	
 	public Function(String username) {
 		manager=username;
@@ -61,71 +77,39 @@ public class Function extends JFrame {
 		myEvent();
 	}
 	public void myEvent(){
-		//给期末输入框添加回车事件
-		end.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e){
-				if(e.getKeyCode()==KeyEvent.VK_ENTER){
-					h=Integer.parseInt(homework.getText());
-					m=Integer.parseInt(middy.getText());
-					n=Integer.parseInt(normal.getText());
-					t=Integer.parseInt(end.getText());
+		submit.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				DAO dao=new DAO();
+				String sql="insert into function(id,courseId,teamId,teacherId,task,mid,pacific,final) values"
+						+ "('"+createId()+"''"+courseId.get(course.getSelectedIndex())+"','"+teamId.get(team.getSelectedIndex())+"','"+teacherId+"',"
+								+ "'"+homework.getText()+"','"+middy.getText()+"','"+normal.getText()+"','"+end.getText()+"');";
+				if(dao.add(sql)==1){
+					Message message=new Message("执行成功！");
+					message.pack();
+					update();
 				}
+			}
+		});
+		modify.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				DAO dao=new DAO();
+				String sql="update function set"
+						+ "courseId='"+courseId.get(course.getSelectedIndex())+"',teamId='"+teamId.get(team.getSelectedIndex())+"',teacherId='"+teacherId+"',"
+								+ "task='"+homework.getText()+"',mid='"+middy.getText()+"',pacific='"+normal.getText()+"',final='"+end.getText()+"';";
+				if(dao.modify(sql)==1){
+					Message message=new Message("执行成功！");
+					message.pack();
+					update();
+				}
+				
 			}
 		});
 	}
 	
-	//保存数据
-	public void save(int arg0,int arg1,int arg2,int arg3) throws Exception{
-		Conn conn=new Conn();
-		if(conn.getConnection()){
-			conn.getState();
-			String sql="";//请填写插入的sql语句
-			conn.getStatement().executeQuery(sql);
-			conn.close();
-		}else{
-			Message message=new Message("网络错误，无法连接到数据库");
-			message.pack();
-			conn.close();
-		}
-	}
-	//更新表格中的数据
-	public List<Map<String,Object>> update() throws Exception{
-		Conn conn=new Conn();
-		if(conn.getConnection()){
-			conn.getState();
-			String sql="";//请填写查询的sql语句
-			ResultSet resultSet=conn.getStatement().executeQuery(sql);
-			while(resultSet.next()){
-				Map<String,Object> m=new HashMap<String, Object>();
-				m.put("课程", resultSet.getString("course"));
-				m.put("作业", resultSet.getString("task"));
-				m.put("期中", resultSet.getString("mid"));
-				m.put("平时", resultSet.getString("pacific"));
-				m.put("期末", resultSet.getString("final"));
-				list.add(m);
-			}
-			conn.close();
-		}else{
-			Message message=new Message("网络错误，无法连接到数据库");
-			message.pack();
-			conn.close();
-		}
-		return list;
-	}
-	//修改一条数据
-	public void modify(int arg0) throws Exception{
-		Conn conn=new Conn();
-		if(conn.getConnection()){
-			conn.getState();
-			String sql="";//请填写修改的sql语句
-			conn.getStatement().executeUpdate(sql);
-			conn.close();
-		}else{
-			Message message=new Message("网络错误，无法连接到数据库");
-			message.pack();
-			conn.close();
-		}
-	}
 	//选中某一行表格的数据，并将其显示在填写栏
 	private class MyListener implements ListSelectionListener{
 		int f=0;
@@ -139,7 +123,7 @@ public class Function extends JFrame {
 			list.add(tableValueV.get(f).get(3));
 			list.add(tableValueV.get(f).get(4));
 			list.add(tableValueV.get(f).get(5));
-			course.setText(list.get(1).toString());
+			course.setSelectedItem(list.get(1).toString());
 			homework.setText(list.get(2).toString());
 			middy.setText(list.get(3).toString());	
 			normal.setText(list.get(4).toString());	
@@ -149,7 +133,7 @@ public class Function extends JFrame {
 	}
 	public void init(){
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 600, 400);
+		setBounds(100, 100, 650, 400);
 		setLocationRelativeTo(null);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -197,11 +181,15 @@ public class Function extends JFrame {
 		label3=new JLabel("期中");
 		label4=new JLabel("平时");
 		label5=new JLabel("期末");
-		course=new JTextField(10);
+		course=new JComboBox();
 		homework=new JTextField(5);
 		middy=new JTextField(5);
 		normal=new JTextField(5);
 		end=new JTextField(5);
+		JLabel te=new JLabel("班级");
+		team=new JComboBox();
+		bottom.add(te);
+		bottom.add(team);
 		bottom.add(label1);
 		bottom.add(course);
 		bottom.add(label2);
@@ -212,28 +200,147 @@ public class Function extends JFrame {
 		bottom.add(normal);
 		bottom.add(label5);
 		bottom.add(end);
+		submit=new JButton("提交");
+		modify=new JButton("修改");
+		bottom.add(submit);
+		bottom.add(modify);
 		
 		foot = new JPanel();
 		contentPane.add(foot, BorderLayout.SOUTH);
 		foot.setLayout(new GridLayout(1,6));
-		JLabel welcome = new JLabel("欢迎使用");
+		JLabel welcome = new JLabel("欢迎光临");
 		welcome.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		foot.add(welcome);
 		
-		JLabel user = new JLabel("操作者：");
-		user.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
-		foot.add(user);
+		JLabel ctrl = new JLabel("使用者："+manager);
+		ctrl.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));   
+		foot.add(ctrl);
 		
-		JLabel data = new JLabel("日期");
+		GetDate getdata=new GetDate();
+		JLabel data = new JLabel("日期："+getdata.getDateString());
 		data.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		foot.add(data);
 		
-		JLabel time = new JLabel("现在的时间：");
+		GetTime getTime=new GetTime();
+		JLabel time = new JLabel("现在的时间是："+getTime.getTime());
 		time.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		foot.add(time);
+		this.setTimer(time);
 		setVisible(true);
 	}
+
 	public void initData(){
-		
+		String[] str={"id"};
+		List<String> teamId=new ArrayList<String>();
+		DAO dao=new DAO();
+		List<List<Object>> teacherIds=dao.query("select id from teacher where name='"+manager+"'", str);
+		if(!teacherIds.isEmpty()&&teacherIds.get(0).get(0)!=null){
+			teacherId=(String)teacherIds.get(0).get(0);
+		}
+		String key[]={"课程","作业","期中","平时","期末"};
+		String values[]={"course.name","task","mid","pacific","final"};
+		String sql="select course.name,task,mid,pacific,final from course,function where course.id=function.courseId and function.teacherId='"+teacherId+"'";
+		list=dao.query(sql, values, key);
+		if(!list.isEmpty()&&list.size()>0){
+			tableValueV.clear();
+			int c=0;
+			for(int row=0;row<list.size();row++){
+				Vector<Object> rowV=new Vector<Object>();//创建行向量
+				rowV.add(row);
+				for(Map<String,Object> m:list){
+					rowV.add(m.get("课程"+c));
+					rowV.add(m.get("作业"+c));
+					rowV.add(m.get("期中"+c));
+					rowV.add(m.get("平时"+c));
+					rowV.add(m.get("期末"+c));
+				}
+				c++;
+				tableValueV.add(rowV);									//把行向量添加到数据向量
+			}
+		}
+		String key2[]={"编号","课程"};
+		String values2[]={"course.id","course.name"};
+		sql="select course.id,course.name from course,team_course where course.id=team_course.courseId and team_course.teacherId='"+teacherId+"'";
+		list=dao.query(sql, values2, key2);
+		if(!list.isEmpty()&&list.size()>0){
+			int c=0;
+			for(int row=0;row<list.size();row++){
+				for(Map<String,Object> m:list){
+					course.addItem(m.get("课程"+c).toString());
+					courseId.add((String)m.get("编号"+c));
+				}
+				c++;
+			}
+		}
+		String key3[]={"编号","班级"};
+		String values3[]={"team.id","team.name"};
+		sql="select team.id,team.name from team,team_course where team.id=team_course.teamId and team_course.teacherId='"+teacherId+"'";
+		list=dao.query(sql, values2, key2);
+		if(!list.isEmpty()&&list.size()>0){
+			int c=0;
+			for(int row=0;row<list.size();row++){
+				for(Map<String,Object> m:list){
+					team.addItem(m.get("班级"+c).toString());
+					teamId.add((String)m.get("编号"+c));
+				}
+				c++;
+			}
+		}
 	}
+	
+	public void update(){
+		String[] str={"id"};
+		String teacherId="";
+		List<String> teamId=new ArrayList<String>();
+		DAO dao=new DAO();
+		List<List<Object>> teacherIds=dao.query("select id from teacher where name='"+manager+"'", str);
+		if(!teacherIds.isEmpty()&&teacherIds.get(0).get(0)!=null){
+			teacherId=(String)teacherIds.get(0).get(0);
+		}
+		String key[]={"课程","作业","期中","平时","期末"};
+		String values[]={"course.name","task","mid","pacific","final"};
+		String sql="select course.name,task,mid,pacific,final from course,function where course.id=function.courseId and function.teacherId='"+teacherId+"'";
+		list=dao.query(sql, values, key);
+		if(!list.isEmpty()&&list.size()>0){
+			tableValueV.clear();
+			int c=0;
+			for(int row=0;row<list.size();row++){
+				Vector<Object> rowV=new Vector<Object>();//创建行向量
+				rowV.add(row);
+				for(Map<String,Object> m:list){
+					rowV.add(m.get("课程"+c));
+					rowV.add(m.get("作业"+c));
+					rowV.add(m.get("期中"+c));
+					rowV.add(m.get("平时"+c));
+					rowV.add(m.get("期末"+c));
+				}
+				c++;
+				tableValueV.add(rowV);									//把行向量添加到数据向量
+			}
+		}
+	}
+	private String createId(){
+		   DAO dao=new DAO();
+		   String[] x={"id"};
+		   List<List<Object>> list=dao.query("select Max(id) as id from function;", x);
+		   if(!list.isEmpty()&&list.get(0).get(0)!=null){
+			   String id=list.get(0).get(0).toString();
+			   String subId=id.substring(8);
+			   return "function"+String.valueOf(Integer.parseInt(subId)+1);
+		   }else{
+			   return "function1001";
+		   }
+	   }
+	//设置Timer 1000ms实现一次动作 实际是一个线程   
+		 private void setTimer(JLabel time){   
+		     final JLabel varTime = time;   
+		     Timer timeAction = new Timer(1000, new ActionListener() {          
+		  
+		         public void actionPerformed(ActionEvent e) {       
+		             GetTime getTime=new GetTime();  
+		             varTime.setText("现在的时间是："+getTime.getTime());   
+		         }      
+		        });            
+		        timeAction.start();        
+		  } 
 }

@@ -5,6 +5,8 @@ import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +70,10 @@ public class TeacherMain extends JFrame {
 	private JTextField te2;//期中
 	private JTextField te3;//平时
 	private JTextField te4;//期末
+	private int a1;
+	private int a2;
+	private int a3;
+	private int a4;
 	private JButton submit;//
 	private JButton modify;//
 	private List<Map<String,Object>> list;
@@ -77,6 +83,10 @@ public class TeacherMain extends JFrame {
 	private Vector<Vector<Object>> tableValueV;
 	private String manager;
 	private JComboBox course;
+	private List<Object> cid;
+	private JComboBox theFunction;
+	private List<String> fid;
+	private JPanel check;
 	/**
 	 * Launch the application.
 	 */
@@ -128,6 +138,15 @@ public class TeacherMain extends JFrame {
 		JMenu screen = new JMenu("筛选");
 		menuBar.add(screen);
 		
+		JMenu function=new JMenu("函数");
+		menuBar.add(function);
+		
+		setFuntion=new JMenuItem("自定义函数设置");
+		function.add(setFuntion);
+		
+		selectFuntion=new JMenuItem("选择函数");
+		function.add(selectFuntion);
+		
 		btn_grade = new JMenuItem("成绩");
 		screen.add(btn_grade);
 		
@@ -149,6 +168,9 @@ public class TeacherMain extends JFrame {
 		jtop.add(scrn);
 		condition=new JTextField(20);
 		jtop.add(condition);
+		check=new JPanel();
+		theFunction=new JComboBox();
+		topCenter.add(check,BorderLayout.SOUTH);
 		//复制 start
 		Vector<String> columnNameV=new Vector<String>();	//创建列名向量
 		columnNameV.add("学号");
@@ -200,12 +222,16 @@ public class TeacherMain extends JFrame {
 		sno=new JTextField(10);
 		sname1=new JLabel("名字");
 		sname=new JTextField(10);
+		JLabel course1=new JLabel("课程");
+		course=new JComboBox();
 		grade1=new JLabel("成绩");
 		this.grade=new JTextField(10);
 		addTop.add(sno1);
 		addTop.add(sno);
 		addTop.add(sname1);
 		addTop.add(sname);
+		addTop.add(course1);
+		addTop.add(course);
 		addTop.add(grade1);
 		addTop.add(this.grade);
 		function0=new JLabel("函数：");
@@ -292,39 +318,126 @@ public class TeacherMain extends JFrame {
 				setVisible(false);
 			}
 		});
+		setFuntion.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Function function=new Function(manager);
+			}
+		});
+		selectFuntion.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String[] str={"id"};
+				String teacherId="";
+				List<String> teamId=new ArrayList<String>();
+				DAO dao=new DAO();
+				List<List<Object>> teacherIds=dao.query("select id from teacher where name='"+manager+"'", str);
+				if(!teacherIds.isEmpty()&&teacherIds.get(0).get(0)!=null){
+					teacherId=(String)teacherIds.get(0).get(0);
+				}
+				//获取教师的自定义函数
+				String key[]={"编号","教师名","课程","作业","期中","平时","期末"};
+				String values[]={"function.id","teacher.name","task","mid","pacific","final"};
+				String sql="select function.id,teacher.name,task,mid,pacific,final "
+						+ "from function,teacher,course "
+						+ "where function.teacherId=teacher.id and function.courseId=course.id and teacher.id='"+teacherId+"'";
+				list=dao.query(sql, values, key);
+				if(!list.isEmpty()&&list.get(0)!=null){
+					int c=0;
+					for(int i=0;i<list.size();i++){
+						for(Map<String,Object> map:list){
+							String fvalue=""+map.get("课程"+c)+":作业"+map.get("作业"+c)+"%+期中"+map.get("期中"+c)+"%+平时"+map.get("平时"+c)+"%+期末"+map.get("期末"+c)+"";
+							fid.add((String)map.get("编号"+c));
+							theFunction.addItem(fvalue);
+						}
+					c++;
+					}
+				}
+				JLabel fff=new JLabel("请选择函数:");
+				check.add(fff);
+				check.add(theFunction);
+			}
+		});
+		theFunction.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				DAO dao=new DAO();
+				String key[]={"作业","期中","平时","期末"};
+				String values[]={"task","mid","pacific","final"};
+				String sql="select task,mid,pacific,final from function where id='"+fid.get(theFunction.getSelectedIndex())+"'";
+				list=dao.query(sql, values, key);
+				if(!list.isEmpty()&&list.size()>0){
+					int c=0;
+					for(int i=0;i<list.size();i++){
+						for(Map<String,Object> map:list){
+							function1.setText(map.get("作业"+c)+"作业+");
+							function2.setText(map.get("期中"+c)+"期中+");
+							function3.setText(map.get("平时"+c)+"平时+");
+							function4.setText(map.get("期末"+c)+"期末+");
+							a1=(int)map.get("作业"+c);
+							a2=(int)map.get("期中"+c);
+							a3=(int)map.get("平时"+c);
+							a4=(int)map.get("期末"+c);
+						}
+						c++;
+					}
+				}
+			}
+		});
 		//筛选方式为成绩
 		btn_grade.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				tableValueV.clear();
+				String[] str={"id"};
+				String teacherId="";
+				List<String> teamId=new ArrayList<String>();
 				DAO dao=new DAO();
+				List<List<Object>> teacherIds=dao.query("select id from teacher where name='"+manager+"'", str);
+				if(!teacherIds.isEmpty()&&teacherIds.get(0).get(0)!=null){
+					teacherId=(String)teacherIds.get(0).get(0);
+				}
+				String[] s1={"teamId"};
+				//获取教师所教的班级id
+				List<List<Object>> teams=dao.query("select teamId from team_course where teacherId='"+teacherId+"'", s1);
+				if(!teams.isEmpty()&&teams.get(0)!=null){
+					for(Object obj:teams.get(0)){
+						teamId.add((String)obj);
+					}
+				}
 				String key[]={"学号","名字","课程","学分","课程分类","考核方式","成绩","班级"};
 				String values[]={"student.id","student.name","course.name","credit","ctype","ctype2","score","team.name"};
-				String sql="select student.id,student.name,course.name,credit,ctype,ctype2,score,team.name "
-						+ "from student,grade,team "
-						+ "where team.id in(select student.teamId from student where student.id in(select team_course.sno from grade group by grade having score'"+condition.getText()+"'))"
-								+ "and course.id=grade.id and student.id=grade.studentId";
-				List<Map<String,Object>> list=dao.query(sql, values, key);
-				if(!list.isEmpty()){
-					tableValueV.clear();
-					int c=0;
-					for(int row=1;row<list.size();row++){
-						Vector<Object> rowV=new Vector<Object>();				//创建行向量
-						for(Map<String,Object> m:list){
-							rowV.add(m.get("学号"+c));
-							rowV.add(m.get("名字"+c));
-							rowV.add(m.get("课程"+c));
-							rowV.add(m.get("学分"+c));
-							rowV.add(m.get("课程分类"+c));
-							rowV.add(m.get("考核方式"+c));
-							rowV.add(m.get("成绩"+c));
-							rowV.add(m.get("学分"+c));
-							rowV.add(calCredit((int)m.get("成绩"+c)));
-							rowV.add(calCredit((int)m.get("成绩"+c))+(int)m.get("学分"+c));
-							rowV.add(m.get("班级"+c));
-						}
-						c++;
-						tableValueV.add(rowV);									//把行向量添加到数据向量
+				List<Map<String,Object>> mlist=new ArrayList<Map<String,Object>>();
+				for(String ids:teamId){
+					String sql="select student.id,student.name,course.name,credit,ctype,ctype2,score,team.name"
+							+ "from student,course,team,grade,team_course"
+							+ "where student.id=grade.studentId and grade.courseId=course.id and course.id=team_course.courseId and team.id=team_course.teamId and team.id='"+ids+"'"
+									+ "group by student.id having score "+condition.getText()+"";
+					mlist=dao.query(sql, values, key);
+					if(!mlist.isEmpty()&& mlist.get(0)!=null){
+						int c=0;
+						for(int row=1;row<mlist.size();row++){
+							Vector<Object> rowV=new Vector<Object>();				//创建行向量
+							for(Map<String,Object> m:mlist){
+								rowV.add(m.get("学号"+c));
+								rowV.add(m.get("名字"+c));
+								rowV.add(m.get("课程"+c));
+								rowV.add(m.get("学分"+c));
+								rowV.add(m.get("课程分类"+c));
+								rowV.add(m.get("考核方式"+c));
+								rowV.add(m.get("成绩"+c));
+								rowV.add(m.get("学分"+c));
+								rowV.add(calCredit((int)m.get("成绩"+c)));
+								rowV.add(calCredit((int)m.get("成绩"+c))+(int)m.get("学分"+c));
+								rowV.add(m.get("班级"+c));
+							}
+							c++;
+							tableValueV.add(rowV);
+						}//把行向量添加到数据向量
 					}
 				}
 			}
@@ -334,34 +447,52 @@ public class TeacherMain extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				tableValueV.clear();
+				String[] str={"id"};
+				String teacherId="";
+				List<String> teamId=new ArrayList<String>();
 				DAO dao=new DAO();
+				List<List<Object>> teacherIds=dao.query("select id from teacher where name='"+manager+"'", str);
+				if(!teacherIds.isEmpty()&&teacherIds.get(0).get(0)!=null){
+					teacherId=(String)teacherIds.get(0).get(0);
+				}
+				String[] s1={"teamId"};
+				//获取教师所教的班级id
+				List<List<Object>> teams=dao.query("select teamId from team_course where teacherId='"+teacherId+"'", s1);
+				if(!teams.isEmpty()&&teams.get(0)!=null){
+					for(Object obj:teams.get(0)){
+						teamId.add((String)obj);
+					}
+				}
 				String key[]={"学号","名字","课程","学分","课程分类","考核方式","成绩","班级"};
 				String values[]={"student.id","student.name","course.name","credit","ctype","ctype2","score","team.name"};
-				String sql="select student.id,student.name,course.name,credit,ctype,ctype2,score,team.name "
-						+ "from student,grade,team "
-						+ "where team.id in(select student.teamId from student where student.id in(select grade.studentId from grade group by grade having score '"+(Integer.parseInt(condition.getText())*10+50)+"'))"
-								+ "and course.id=grade.id and student.id=grade.studentId";
-				List<Map<String,Object>> list=dao.query(sql, values, key);
-				if(!list.isEmpty()){
-					tableValueV.clear();
-					int c=0;
-					for(int row=1;row<list.size();row++){
-						Vector<Object> rowV=new Vector<Object>();				//创建行向量
-						for(Map<String,Object> m:list){
-							rowV.add(m.get("学号"+c));
-							rowV.add(m.get("名字"+c));
-							rowV.add(m.get("课程"+c));
-							rowV.add(m.get("学分"+c));
-							rowV.add(m.get("课程分类"+c));
-							rowV.add(m.get("考核方式"+c));
-							rowV.add(m.get("成绩"+c));
-							rowV.add(m.get("学分"+c));
-							rowV.add(calCredit((int)m.get("成绩"+c)));
-							rowV.add(calCredit((int)m.get("成绩"+c))+(int)m.get("学分"+c));
-							rowV.add(m.get("班级"+c));
-						}
-						c++;
-						tableValueV.add(rowV);									//把行向量添加到数据向量
+				List<Map<String,Object>> mlist=new ArrayList<Map<String,Object>>();
+				for(String ids:teamId){
+					String sql="select student.id,student.name,course.name,credit,ctype,ctype2,score,team.name"
+							+ "from student,course,team,grade,team_course"
+							+ "where student.id=grade.studentId and grade.courseId=course.id and course.id=team_course.courseId and team.id=team_course.teamId and team.id='"+ids+"'"
+									+ "group by student.id having credit '"+condition.getText()+"'";
+					mlist=dao.query(sql, values, key);
+					if(!mlist.isEmpty()&& mlist.get(0)!=null){
+						int c=0;
+						for(int row=1;row<mlist.size();row++){
+							Vector<Object> rowV=new Vector<Object>();				//创建行向量
+							for(Map<String,Object> m:mlist){
+								rowV.add(m.get("学号"+c));
+								rowV.add(m.get("名字"+c));
+								rowV.add(m.get("课程"+c));
+								rowV.add(m.get("学分"+c));
+								rowV.add(m.get("课程分类"+c));
+								rowV.add(m.get("考核方式"+c));
+								rowV.add(m.get("成绩"+c));
+								rowV.add(m.get("学分"+c));
+								rowV.add(calCredit((int)m.get("成绩"+c)));
+								rowV.add(calCredit((int)m.get("成绩"+c))+(int)m.get("学分"+c));
+								rowV.add(m.get("班级"+c));
+							}
+							c++;
+							tableValueV.add(rowV);
+						}//把行向量添加到数据向量
 					}
 				}
 			}
@@ -389,7 +520,7 @@ public class TeacherMain extends JFrame {
 						if(!list.isEmpty()){
 							tableValueV.clear();
 							int c=0;
-							for(int row=1;row<list.size();row++){
+							for(int row=0;row<list.size();row++){
 								Vector<Object> rowV=new Vector<Object>();				//创建行向量
 								for(Map<String,Object> m:list){
 									rowV.add(ss.get(0));
@@ -417,7 +548,13 @@ public class TeacherMain extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				DAO dao=new DAO();
+				String sql="insert into grade(studentId,courseId,score) values('"+sno.getText()+"','"+cid.get(course.getSelectedIndex())+"','"+finalScore()+"')";
+				if(dao.add(sql)==1){
+					Message message=new Message("添加成功！");
+					message.pack();
+					update();
+				}
 			}
 		});
 		//点击了修改按钮
@@ -425,6 +562,13 @@ public class TeacherMain extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				DAO dao=new DAO();
+				String sql="update grade set studentId='"+sno.getText()+"',courseId='"+cid.get(course.getSelectedIndex())+"',score='"+finalScore()+"')";
+				if(dao.modify(sql)==1){
+					Message message=new Message("修改成功！");
+					message.pack();
+					update();
+				}
 			}
 		});
 	}
@@ -442,47 +586,110 @@ public class TeacherMain extends JFrame {
 		   }
 	   }
 	public void initData(){
+		tableValueV.clear();
 		String[] str={"id"};
+		String teacherId="";
+		List<String> teamId=new ArrayList<String>();
 		DAO dao=new DAO();
-		List<List<Object>> teacherId=dao.query("select id from teacher where name='"+manager+"'", str);
-		String[] s1={"teamId","courseId"};
-		List<List<Object>> ss=dao.query("select teamId,courseId fromteam_course where teacherId='"+teacherId.get(0).get(0)+"'", s1);
-		for(List<Object> ls:ss){
-			String[] sc={"student.id","student.name","course.name","credit","ctype","ctype2","score","team.name"};
-			String sql="select student.id,student.name,course.name,credit,ctype,ctype2,score"
-					+ "from student,course,grade,team"
-					+ "where student.is=grade.studentId and course.id='"+ls.get(1)+"' and team.name='"+ls.get(0)+"' and grade.courseId=course.id and student.teamId=team.id";
-			List<List<Object>> sc2=dao.query(sql, str);
+		List<List<Object>> teacherIds=dao.query("select id from teacher where name='"+manager+"'", str);
+		if(!teacherIds.isEmpty()&&teacherIds.get(0).get(0)!=null){
+			teacherId=(String)teacherIds.get(0).get(0);
+		}
+		String[] s1={"teamId"};
+		//获取教师所教的班级id
+		List<List<Object>> teams=dao.query("select teamId from team_course where teacherId='"+teacherId+"'", s1);
+		if(!teams.isEmpty()&&teams.get(0)!=null){
+			for(Object obj:teams.get(0)){
+				teamId.add((String)obj);
+			}
+		}
+		String key[]={"学号","名字","课程","学分","课程分类","考核方式","成绩","班级"};
+		String values[]={"student.id","student.name","course.name","credit","ctype","ctype2","score","team.name"};
+		List<Map<String,Object>> mlist=new ArrayList<Map<String,Object>>();
+		for(String ids:teamId){
+			String sql="select student.id,student.name,course.name,credit,ctype,ctype2,score,team.name"
+					+ "from student,course,team,grade,team_course"
+					+ "where student.id=grade.studentId and grade.courseId=course.id and course.id=team_course.courseId and team.id=team_course.teamId and team.id='"+ids+"'";
+			mlist=dao.query(sql, values, key);
+			if(!mlist.isEmpty()&& mlist.get(0)!=null){
+				int c=0;
+				for(int row=1;row<mlist.size();row++){
+					Vector<Object> rowV=new Vector<Object>();				//创建行向量
+					for(Map<String,Object> m:mlist){
+						rowV.add(m.get("学号"+c));
+						rowV.add(m.get("名字"+c));
+						rowV.add(m.get("课程"+c));
+						rowV.add(m.get("学分"+c));
+						rowV.add(m.get("课程分类"+c));
+						rowV.add(m.get("考核方式"+c));
+						rowV.add(m.get("成绩"+c));
+						rowV.add(m.get("学分"+c));
+						rowV.add(calCredit((int)m.get("成绩"+c)));
+						rowV.add(calCredit((int)m.get("成绩"+c))+(int)m.get("学分"+c));
+						rowV.add(m.get("班级"+c));
+					}
+					c++;
+					tableValueV.add(rowV);
+				}//把行向量添加到数据向量
+			}
+		}
+		String s[]={"course.id","course.name"};
+		List<List<Object>> ls=dao.query("select course.name from course,team_course where course.id=team_course.courseId and team_course.teacherId='"+teacherId+"'", str);
+		if(!ls.isEmpty()&&ls.size()>0){
+			for(List<Object> ll:ls){
+				for(Object obj:ll){
+					cid.add(obj);
+					course.addItem(obj);
+				}
+			}
 		}
 	}
 	public void update(){
+		tableValueV.clear();
+		String[] str={"id"};
+		String teacherId="";
+		List<String> teamId=new ArrayList<String>();
 		DAO dao=new DAO();
+		List<List<Object>> teacherIds=dao.query("select id from teacher where name='"+manager+"'", str);
+		if(!teacherIds.isEmpty()&&teacherIds.get(0).get(0)!=null){
+			teacherId=(String)teacherIds.get(0).get(0);
+		}
+		String[] s1={"teamId"};
+		//获取教师所教的班级id
+		List<List<Object>> teams=dao.query("select teamId from team_course where teacherId='"+teacherId+"'", s1);
+		if(!teams.isEmpty()&&teams.get(0)!=null){
+			for(Object obj:teams.get(0)){
+				teamId.add((String)obj);
+			}
+		}
 		String key[]={"学号","名字","课程","学分","课程分类","考核方式","成绩","班级"};
 		String values[]={"student.id","student.name","course.name","credit","ctype","ctype2","score","team.name"};
-		String sql="select student.id,student.name,course.name,credit,ctype,ctype2,score,team.name "
-				+ "from student,course,team,grade "
-				+ "where team.id in(select student.teamId from student where student.id in(select grade.studentId from grade)) and student.id=grade.studentId and grade.courseId=course.id";
-		List<Map<String,Object>> list=dao.query(sql, values, key);
-		if(!list.isEmpty()){
-			tableValueV.clear();
-			int c=0;
-			for(int row=1;row<list.size();row++){
-				Vector<Object> rowV=new Vector<Object>();				//创建行向量
-				for(Map<String,Object> m:list){
-					rowV.add(m.get("学号"+c));
-					rowV.add(m.get("名字"+c));
-					rowV.add(m.get("课程"+c));
-					rowV.add(m.get("学分"+c));
-					rowV.add(m.get("课程分类"+c));
-					rowV.add(m.get("考核方式"+c));
-					rowV.add(m.get("成绩"+c));
-					rowV.add(m.get("学分"+c));
-					rowV.add(calCredit((int)m.get("成绩"+c)));
-					rowV.add(calCredit((int)m.get("成绩"+c))+(int)m.get("学分"+c));
-					rowV.add(m.get("班级"+c));
-				}
-				c++;
-				tableValueV.add(rowV);									//把行向量添加到数据向量
+		List<Map<String,Object>> mlist=new ArrayList<Map<String,Object>>();
+		for(String ids:teamId){
+			String sql="select student.id,student.name,course.name,credit,ctype,ctype2,score,team.name"
+					+ "from student,course,team,grade,team_course"
+					+ "where student.id=grade.studentId and grade.courseId=course.id and course.id=team_course.courseId and team.id=team_course.teamId and team.id='"+ids+"'";
+			mlist=dao.query(sql, values, key);
+			if(!mlist.isEmpty()&& mlist.get(0)!=null){
+				int c=0;
+				for(int row=1;row<mlist.size();row++){
+					Vector<Object> rowV=new Vector<Object>();				//创建行向量
+					for(Map<String,Object> m:mlist){
+						rowV.add(m.get("学号"+c));
+						rowV.add(m.get("名字"+c));
+						rowV.add(m.get("课程"+c));
+						rowV.add(m.get("学分"+c));
+						rowV.add(m.get("课程分类"+c));
+						rowV.add(m.get("考核方式"+c));
+						rowV.add(m.get("成绩"+c));
+						rowV.add(m.get("学分"+c));
+						rowV.add(calCredit((int)m.get("成绩"+c)));
+						rowV.add(calCredit((int)m.get("成绩"+c))+(int)m.get("学分"+c));
+						rowV.add(m.get("班级"+c));
+					}
+					c++;
+					tableValueV.add(rowV);
+				}//把行向量添加到数据向量
 			}
 		}
 	}
@@ -509,4 +716,8 @@ public class TeacherMain extends JFrame {
 					grade.setText(list.get(6).toString());		
 				}	
 		}
+		//计算最终总分
+	public double finalScore(){
+		return Integer.parseInt(te1.getText())*a1+Integer.parseInt(te2.getText())*a2+Integer.parseInt(te3.getText())*a3+Integer.parseInt(te4.getText())*a4;
+	}
 }

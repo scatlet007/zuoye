@@ -36,6 +36,7 @@ import com.frames.MFixedColumnTable;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -74,8 +75,9 @@ public class TeacherFrame extends JFrame {
 	private JComboBox sex;
 	private JComboBox position;
 	private JComboBox role;
-	private String collegeId;
-	private String roleId;
+	private List<String> collegeId;
+	private List<String> roleId;
+	private JButton btnNewButton;
 	/**
 	 * Launch the application.
 	 */
@@ -211,7 +213,8 @@ public class TeacherFrame extends JFrame {
 		
 		position = new JComboBox();
 		position.setBounds(280, 105, 152, 21);
-		
+		position.addItem("班主任");
+		position.addItem("普通教师");
 		contentPane.add(position);
 		
 		JLabel role1 = new JLabel("\u89D2\u8272\uFF1A");
@@ -236,6 +239,7 @@ public class TeacherFrame extends JFrame {
 		//复制 start
 		Vector<String> columnNameV=new Vector<String>();	//创建列名向量
 		columnNameV.add("序号");
+		columnNameV.add("编号");
 		columnNameV.add("教师名");
 		columnNameV.add("性别");
 		columnNameV.add("年龄");
@@ -285,6 +289,10 @@ public class TeacherFrame extends JFrame {
 		time.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		panel_1.add(time);
 		this.setTimer(time);
+		
+		modify = new JButton("\u4FEE\u6539");
+		modify.setBounds(770, 108, 93, 23);
+		contentPane.add(modify);
 		setVisible(true);
 	}
 	public void myEvent(){
@@ -337,6 +345,14 @@ public class TeacherFrame extends JFrame {
 						
 					}
 				});
+				courseAdd.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						CourseFrame courseFrame=new CourseFrame(manager);
+						setVisible(false);
+					}
+				});
 				//点击角色管理
 				roleAdd.addActionListener(new ActionListener() {
 					
@@ -347,34 +363,24 @@ public class TeacherFrame extends JFrame {
 					}
 				});
 		DAO dao=new DAO();
-		String[] str={"id"};
-		List<List<Object>> tl=dao.query("select id from team where name='"+collegeName.getSelectedItem()+"';", str);
-		for(List<Object> l:tl){
-			collegeId=(String)l.get(0);
-		}
-		List<List<Object>> rl=dao.query("select id from role where name='"+role.getSelectedItem()+"';", str);
-		for(List<Object> l:tl){
-			roleId=(String)l.get(0);
-		}
 		submit.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				DAO dao=new DAO();
-				String sql="insert into teacher(id,name,password,sex,age,collegeId,roleId)"
+				String sql="insert into teacher(id,name,password,sex,age,position,collegeId,roleId)"
 						+ "values('"+createId()+"','"+teacher.getText()+"','123456','"+sex.getSelectedItem()+"','"+age.getText()+"',"
-								+ "'"+collegeId+"','"+roleId+"')";
-				if(collegeId==null||collegeId.equals("")){
+								+ "'"+position.getItemAt(position.getSelectedIndex())+"','"+collegeId.get(collegeName.getSelectedIndex())+"','"+roleId.get(role.getSelectedIndex())+"')";
+				if(collegeId.get(collegeName.getSelectedIndex())==null||collegeId.get(collegeName.getSelectedIndex()).equals("")){      
 					Message message=new Message("学院为空，请添加相应学院！");
 					message.pack();
 				}else{
 					if(dao.add(sql)==1){
 						Message message=new Message("添加成功！");
 						message.pack();
-						update();
 					}
 				}
-				
+				update();
 			}
 		});
 		modify.addActionListener(new ActionListener() {
@@ -382,13 +388,13 @@ public class TeacherFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				DAO dao=new DAO();
-				String sql="update teacher set name='"+teacher.getText()+"',sex='"+sex.getSelectedItem()+"',"
-						+ "age='"+age.getText()+"',collegeId='"+collegeId+"',roleId='"+roleId+"' where id='"+id+"'";
+				String sql="update teacher set name='"+teacher.getText()+"',sex='"+sex.getItemAt(sex.getSelectedIndex())+"',"
+						+ "age='"+age.getText()+"',telephone='"+phone.getText()+"',position='"+position.getItemAt(position.getSelectedIndex())+"',collegeId='"+collegeId.get(collegeName.getSelectedIndex())+"',roleId='"+roleId.get(role.getSelectedIndex())+"' where id='"+id+"'";
 				if(dao.modify(sql)==1){
 					Message message=new Message("修改成功！");
 					message.pack();
-					update();
 				}
+				update();
 			}
 		});
 	}
@@ -397,9 +403,8 @@ public class TeacherFrame extends JFrame {
 		public void initData(){
 			DAO dao=new DAO();
 			String[] key={"编号","教师名","性别","年龄","角色","手机号","学院","职位"};
-			String[] values={"id","teacher.name","sex","age","role.name","telephone","college","position"};
-			list=dao.query("select teacher.id,teacher.name,sex,age,role.name,college.name,telephone,position from teacher"
-					+ ",college,role where role.id in(select teacher.roleId from teacher where teacher.colegeId in( select college.id from cololege));", values, key);
+			String[] values={"teacher.id","teacher.name","sex","age","role.name","telephone","college.name","position"};
+			list=dao.query("select teacher.id,teacher.name,sex,age,role.name,college.name,telephone,position from teacher,role,college where teacher.collegeId=college.id and role.id=teacher.roleId;", values, key);
 			if(!list.isEmpty()){
 				tableValueV.clear();
 				int c=0;
@@ -420,14 +425,30 @@ public class TeacherFrame extends JFrame {
 					tableValueV.add(rowV);									//把行向量添加到数据向量
 				}
 			}
-			String[] str={"name"};
-			List<List<Object>> tl=dao.query("select id from college;", str);
-			for(List<Object> l:tl){
-				collegeName.addItem(l.get(0));
+			System.out.println("aaa");
+			collegeId=new ArrayList<String>();
+			String[] values1={"id","name"};
+			String key1[]={"id","name"};
+			List<Map<String,Object>> ls=dao.query("select id,name from college;", values1,key1);
+			if(!ls.isEmpty()){
+				int c=0;
+				collegeName.removeAllItems();
+				for(Map<String,Object> l:ls){
+					collegeName.addItem(l.get("name"+c));
+					collegeId.add((String)l.get("id"+c));
+					c++;
+				}
 			}
-			List<List<Object>> rl=dao.query("select id from role ;", str);
-			for(List<Object> l:tl){
-				role.addItem(l.get(0));
+			roleId=new ArrayList<String>();
+			List<Map<String,Object>> roles=dao.query("select id,name from role;", values1,key1);
+			if(!roles.isEmpty()){
+				int c=0;
+				role.removeAllItems();
+				for(Map<String,Object> l:roles){
+					role.addItem(l.get("name"+c));
+					roleId.add((String)l.get("id"+c));
+					c++;
+				}
 			}
 		}
 			//选中某一行表格的数据，并将其显示在填写栏
@@ -441,10 +462,19 @@ public class TeacherFrame extends JFrame {
 				list.add(tableValueV.get(f).get(1));
 				list.add(tableValueV.get(f).get(2));
 				list.add(tableValueV.get(f).get(3));
+				list.add(tableValueV.get(f).get(4));
+				list.add(tableValueV.get(f).get(5));
+				list.add(tableValueV.get(f).get(6));
+				list.add(tableValueV.get(f).get(7));
+				list.add(tableValueV.get(f).get(8));
 				id=list.get(1).toString();
 				teacher.setText(list.get(2).toString());
-				age.setText(list.get(3).toString());			
-				phone.setText(list.get(4).toString());			
+				sex.setSelectedItem(list.get(3));		
+				age.setText(list.get(4).toString());		
+				phone.setText(list.get(5).toString());
+				position.setSelectedItem(list.get(6));
+				collegeName.setSelectedItem(list.get(7));
+				role.setSelectedItem(list.get(8));
 			}
 		}
 		//设置Timer 1000ms实现一次动作 实际是一个线程   
@@ -464,23 +494,22 @@ public class TeacherFrame extends JFrame {
 			   DAO dao=new DAO();
 			   String[] x={"id"};
 			   List<List<Object>> list=dao.query("select Max(id) as id from teacher;", x);
-			   if(!list.isEmpty()){
+			   if(!list.isEmpty()&&list.get(0).get(0)!=null){
 				   String id=list.get(0).get(0).toString();
-				   String subId=id.substring(3);
+				   String subId=id.substring(7);
 				   return "teacher"+String.valueOf(Integer.parseInt(subId)+1);
 			   }else{
 				   return "teacher1001";
 			   }
 		   }
-		   public void update(){
+		   private void update(){
 			   DAO dao=new DAO();
 				String[] key={"编号","教师名","性别","年龄","角色","手机号","学院","职位"};
-				String[] values={"id","teacher.name","sex","age","role.name","telephone","college","position"};
-				list=dao.query("select teacher.id,teacher.name,sex,age,role.name,college.name,telephone,position from teacher"
-						+ ",college,role where role.id in(select teacher.roleId from teacher where teacher.colegeId in( select college.id from cololege));", values, key);
+				String[] values={"teacher.id","teacher.name","sex","age","role.name","telephone","college.name","position"};
+				list=dao.query("select teacher.id,teacher.name,sex,age,role.name,college.name,telephone,position from teacher,role,college where teacher.collegeId=college.id and role.id=teacher.roleId;", values, key);
 				if(!list.isEmpty()){
-					int c=0;
 					tableValueV.clear();
+					int c=0;
 					for(int row=1;row<list.size();row++){
 						Vector<Object> rowV=new Vector<Object>();				//创建行向量
 						rowV.add(row);

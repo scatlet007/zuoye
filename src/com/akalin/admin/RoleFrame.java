@@ -77,8 +77,10 @@ public class RoleFrame extends JFrame {
 		myEvent();
 	}
 	public void init(){
+		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 900, 600);
+		setLocationRelativeTo(null);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -248,6 +250,15 @@ public class RoleFrame extends JFrame {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						TeacherFrame teacherFrame=new TeacherFrame(manager);
+						setVisible(false);
+						
+					}
+				});
+				courseAdd.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						CourseFrame courseFrame=new CourseFrame(manager);
 						setVisible(false);
 						
 					}

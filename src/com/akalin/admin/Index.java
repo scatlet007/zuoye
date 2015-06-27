@@ -213,6 +213,14 @@ public class Index extends JFrame {
 				
 			}
 		});
+		courseAdd.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CourseFrame courseFrame=new CourseFrame(manager);
+				setVisible(false);
+			}
+		});
 		//点击角色管理
 		roleAdd.addActionListener(new ActionListener() {
 			

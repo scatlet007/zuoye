@@ -86,7 +86,7 @@ public class CollegeFrame extends JFrame {
 		top.setLayout(new BorderLayout(0, 0));
 		
 		JMenuBar menuBar = new JMenuBar();
-		top.add(menuBar, BorderLayout.NORTH);
+		top.add(menuBar, BorderLayout.CENTER);
 		
 		JMenu collegeManaer = new JMenu("学院管理");
 		menuBar.add(collegeManaer);
@@ -124,6 +124,42 @@ public class CollegeFrame extends JFrame {
 		roleAdd=new JMenuItem("角色添加");
 		roleManager.add(roleAdd);
 		
+		JPanel panel_1 = new JPanel();
+		top.add(panel_1, BorderLayout.SOUTH);
+		panel_1.setBounds(0, 0, 675, 250);
+		panel_1.setLayout(new BorderLayout());
+		panel_1.setLayout(new BorderLayout());
+		
+		JPanel p1=new JPanel();
+		panel_1.add(p1,BorderLayout.NORTH);
+		JLabel name = new JLabel("学院名");
+		p1.add(name);
+		
+		collegeName = new JTextField();
+		p1.add(collegeName);
+		collegeName.setColumns(10);
+		
+		JLabel createTime = new JLabel("创立时间");
+		p1.add(createTime);
+		
+		creates = new JTextField();
+		creates.setColumns(10);
+		p1.add(creates);
+		
+		JPanel p2=new JPanel();
+		panel_1.add(p2,BorderLayout.CENTER);
+		p2.setBorder(new EmptyBorder(3, 3, 3, 3));
+		JLabel status = new JLabel("简单描述:");
+		p2.add(status);
+		
+		details = new JTextField();
+		details.setColumns(30);
+		p2.add(details);	
+		submit = new JButton("提交");
+		p2.add(submit);
+		modify = new JButton("修改");
+		p2.add(modify);
+		
 		//复制 start
 		Vector<String> columnNameV=new Vector<String>();	//创建列名向量
 		columnNameV.add("序号");
@@ -142,61 +178,11 @@ public class CollegeFrame extends JFrame {
 		}
 		//创建面板，在该面板中实现带行标题栏的表格
 		mainData=new MFixedColumnTable(columnNameV, tableValueV, 1);
-		mainData.setBorder(new EmptyBorder(50, 50, 10, 50));
+		mainData.setBorder(new EmptyBorder(10, 10, 10, 10));
 		contentPane.add(mainData, BorderLayout.CENTER);		//把面板添加到窗体中央
-		JTable f=mainData.getFixedColumnTable();
-		TableColumnModel c=mainData.getFloatingColumnTable().getColumnModel();
-		c.getColumn(2).setPreferredWidth(400);
-		fixed=f.getSelectionModel();
-		fixed.addListSelectionListener(new MyListener());
-		//复制 end
-		
-		JPanel panel = new JPanel();
-		contentPane.add(panel, BorderLayout.SOUTH);
-		panel.setLayout(new BorderLayout());
-		
-		GetDate getdata=new GetDate();
-		
-		GetTime getTime=new GetTime();
-		
-		JPanel panel_1 = new JPanel();
-		panel_1.setBounds(0, 0, 675, 200);
-		panel_1.setLayout(new BorderLayout());
-		panel.add(panel_1, BorderLayout.NORTH);
-		panel_1.setLayout(new BorderLayout());
-		
-		JPanel p1=new JPanel();
-		panel_1.add(p1,BorderLayout.NORTH);
-		JLabel name = new JLabel("学院名");
-		p1.add(name);
-		
-		collegeName = new JTextField();
-		p1.add(collegeName);
-		collegeName.setColumns(25);
-		
-		JLabel createTime = new JLabel("创立时间");
-		p1.add(createTime);
-		
-		creates = new JTextField();
-		creates.setColumns(25);
-		p1.add(creates);
-		
-		JPanel p2=new JPanel();
-		panel_1.add(p2,BorderLayout.CENTER);
-		JLabel status = new JLabel("简单描述:");
-		p2.add(status);
-		
-		details = new JTextField();
-		p2.add(details);
-		details.setColumns(50);
-		
-		submit = new JButton("提交");
-		p2.add(submit);
-		modify = new JButton("修改");
-		p2.add(modify);
 		
 		JPanel bottom = new JPanel();
-		panel_1.add(bottom, BorderLayout.SOUTH);
+		contentPane.add(bottom, BorderLayout.SOUTH);
 		bottom.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		bottom.setLayout(new GridLayout(1,6));
 		
@@ -207,13 +193,20 @@ public class CollegeFrame extends JFrame {
 		JLabel user = new JLabel("操作者："+manager);
 		user.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		bottom.add(user);
+		GetDate getdata=new GetDate();
 		JLabel data = new JLabel("日期："+getdata.getDateString());
 		data.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		bottom.add(data);
+		GetTime getTime=new GetTime();
 		JLabel time = new JLabel("现在的时间是："+getTime.getTime());
 		time.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		bottom.add(time);
 		this.setTimer(time);
+		JTable f=mainData.getFixedColumnTable();
+		TableColumnModel c=mainData.getFloatingColumnTable().getColumnModel();
+		c.getColumn(2).setPreferredWidth(400);
+		fixed=f.getSelectionModel();
+		fixed.addListSelectionListener(new MyListener());
 		setVisible(true);
 	}
 	//选中某一行表格的数据，并将其显示在填写栏
@@ -230,7 +223,9 @@ public class CollegeFrame extends JFrame {
 				id=list.get(0).toString();
 				collegeName.setText(list.get(1).toString());
 				creates.setText(list.get(2).toString());
-				details.setText(list.get(3).toString());		
+				details.setText(list.get(3).toString());
+				thename=list.get(1).toString();
+				thecreate=list.get(2).toString();
 			}
 			
 			
@@ -238,21 +233,21 @@ public class CollegeFrame extends JFrame {
 	//初始化数据
 	public void initData(){
 		DAO dao=new DAO();
-		String[] key={"学院","创建时间","简单描述"};
-		String[] values={"name","createTime","status"};
-		list=dao.query("select *from college;", values, key);
+		String[] key={"编号","学院","创建时间","简单描述"};
+		String[] values={"id","name","createTime","status"};
+		list=dao.query("select id,name,createTime,status from college", values, key);
 		if(!list.isEmpty()){
 			tableValueV.clear();
-			for(int row=1;row<list.size();row++){
+			int c=0;
+			for(int row=0;row<list.size();row++){
 				Vector<Object> rowV=new Vector<Object>();				//创建行向量
-				rowV.add(row);
 				for(Map<String,Object> m:list){
-					rowV.add(m.get("学院"));
-					rowV.add(m.get("创建时间"));
-					rowV.add(m.get("简单描述"));
-					thename=(String)m.get("学院");
-					thecreate=(String)m.get("创建时间");
+					rowV.add(m.get("编号"+c));
+					rowV.add(m.get("学院"+c));
+					rowV.add(m.get("创建时间"+c));
+					rowV.add(m.get("简单描述"+c));
 				}
+				c++;
 				tableValueV.add(rowV);									//把行向量添加到数据向量
 			}
 		}
@@ -327,24 +322,7 @@ public class CollegeFrame extends JFrame {
 				if(dao.add(sql)==1){
 					Message message=new Message("执行成功！");
 					message.pack();
-				}
-				int c=0;
-				String[] key={"学院","创建时间","简单描述"};
-				String[] values={"name","createTime","status"};
-				list=dao.query("select *from college;", values, key);
-				if(!list.isEmpty()){
-					tableValueV.clear();
-					for(int row=1;row<list.size();row++){
-						Vector<Object> rowV=new Vector<Object>();				//创建行向量
-						rowV.add(row);
-						for(Map<String,Object> m:list){
-							rowV.add(m.get("学院"+c));
-							rowV.add(m.get("创建时间"+c));
-							rowV.add(m.get("简单描述"+c));
-						}
-						c++;
-						tableValueV.add(rowV);									//把行向量添加到数据向量
-					}
+					update();
 				}
 			}
 		});
@@ -354,33 +332,35 @@ public class CollegeFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				DAO dao=new DAO();
-				String sql="update college set"
-						+ "name='"+collegeName.getText()+"',createTime='"+creates.getText()+"',status='"+details.getText()+"' where name='"
-						+thename+"'and createTime='"+thecreate+"'";
+				String sql="update college set name='"+collegeName.getText()+"',createTime='"+creates.getText()+"',status='"+details.getText()+"' where id='"+id+"'";
 				if(dao.modify(sql)==1){
 					Message message=new Message("执行成功！");
 					message.pack();
-				}
-				int c=0;
-				String[] key={"学院","创建时间","简单描述"};
-				String[] values={"name","createTime","status"};
-				list=dao.query("select *from college;", values, key);
-				if(!list.isEmpty()){
-					tableValueV.clear();
-					for(int row=1;row<list.size();row++){
-						Vector<Object> rowV=new Vector<Object>();				//创建行向量
-						rowV.add(row);
-						for(Map<String,Object> m:list){
-							rowV.add(m.get("学院"+c));
-							rowV.add(m.get("创建时间"+c));
-							rowV.add(m.get("简单描述"+c));
-						}
-						c++;
-						tableValueV.add(rowV);									//把行向量添加到数据向量
-					}
+					update();
 				}
 			}
 		});
+	}
+	public void update(){
+		DAO dao=new DAO();
+		String[] key={"编号","学院","创建时间","简单描述"};
+		String[] values={"id","name","createTime","status"};
+		list=dao.query("select id,name,createTime,status from college where id is not null;", values, key);
+		if(!list.isEmpty()){
+			tableValueV.clear();
+			int c=0;
+			for(int row=1;row<list.size();row++){
+				Vector<Object> rowV=new Vector<Object>();				//创建行向量
+				for(Map<String,Object> m:list){
+					rowV.add(m.get("编号"+c));
+					rowV.add(m.get("学院"+c));
+					rowV.add(m.get("创建时间"+c));
+					rowV.add(m.get("简单描述"+c));
+				}
+				c++;
+				tableValueV.add(rowV);									//把行向量添加到数据向量
+			}
+		}
 	}
 	 //设置Timer 1000ms实现一次动作 实际是一个线程   
     private void setTimer(JLabel time){   
@@ -398,14 +378,10 @@ public class CollegeFrame extends JFrame {
    private String createId(){
 	   DAO dao=new DAO();
 	   String[] x={"id"};
-	   List<List<Object>> list=dao.query("select Max(id) as id from college;", x);
-	   if(!list.isEmpty()&&list.size()>=1){
-		   for(List<Object> ls:list){
-			   if(!ls.isEmpty()&&ls.size()>0){
-				   id=(String)ls.get(0);
-			   }
-		   }
-		   String subId=id.substring(3);
+	   List<List<Object>> list=dao.query("select Max(id) as id from college", x);
+	   if(!list.isEmpty()&&list.get(0).get(0)!=null){
+		   String id=list.get(0).get(0).toString();
+		   String subId=id.substring(7);
 		   return "college"+String.valueOf(Integer.parseInt(subId)+1);
 	   }else{
 		   return "college1001";

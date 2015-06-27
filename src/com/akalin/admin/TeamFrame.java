@@ -1,10 +1,8 @@
 package com.akalin.admin;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
 import java.awt.GridLayout;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -19,25 +17,21 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
-
-import java.awt.FlowLayout;
 
 import javax.swing.JTextArea;
 
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
-
 import com.akalin.dao.DAO;
 import com.akalin.tool.GetDate;
 import com.akalin.tool.GetTime;
@@ -49,7 +43,6 @@ public class TeamFrame extends JFrame {
 	private JPanel contentPanel;
 	private JTextField teamName;
 	private JTextField name;
-	private JTextField createTime;
 	private JMenu collegeManager;
 	private JMenu majorManager;
 	private JMenu teamManager;
@@ -75,7 +68,7 @@ public class TeamFrame extends JFrame {
 	private JButton modify;
 	private JComboBox majorName;
 	private JTextArea textArea;
-	private String majorId;
+	private List<String> majorId;
 	/**
 	 * Create the frame.
 	 */
@@ -150,8 +143,6 @@ public class TeamFrame extends JFrame {
 		panel.add(major);
 		
 		majorName = new JComboBox();
-		majorName.addItem("计算机");
-		majorName.addItem("软件");
 		majorName.setBounds(114, 28, 135, 21);
 		panel.add(majorName);
 		
@@ -164,27 +155,18 @@ public class TeamFrame extends JFrame {
 		panel.add(name);
 		name.setColumns(10);
 		
-		JLabel create = new JLabel("\u521B\u5EFA\u65F6\u95F4");
-		create.setBounds(53, 83, 54, 15);
-		panel.add(create);
-		
-		createTime = new JTextField();
-		createTime.setBounds(114, 80, 135, 21);
-		panel.add(createTime);
-		createTime.setColumns(10);
-		
 		JLabel status = new JLabel("\u63CF\u8FF0\uFF1A");
-		status.setBounds(316, 86, 54, 15);
+		status.setBounds(53, 87, 54, 15);
 		panel.add(status);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(392, 59, 270, 93);
+		scrollPane.setBounds(102, 56, 270, 93);
 		panel.add(scrollPane);
 		
 		textArea = new JTextArea();
+		scrollPane.setViewportView(textArea);
 		textArea.setColumns(40);
 		textArea.setRows(50);
-		scrollPane.setViewportView(textArea);
 		
 		submit = new JButton("\u63D0\u4EA4");
 		submit.setBounds(699, 79, 93, 23);
@@ -194,21 +176,16 @@ public class TeamFrame extends JFrame {
 		modify.setBounds(699, 112, 93, 23);
 		panel.add(modify);
 		
-		JPanel panel_1 = new JPanel();
-		panel_1.setBounds(20, 201, 849, 299);
-		contentPanel.add(panel_1);
-		panel_1.setLayout(null);
-		
 		JPanel mainData = new JPanel();
 		mainData.setBounds(10, 188, 864, 317);
 		contentPanel.add(mainData);
-		mainData.setLayout(new BorderLayout(0, 0));
+		mainData.setLayout(new BorderLayout());
 		//复制 start
 		Vector<String> columnNameV=new Vector<String>();	//创建列名向量
 		columnNameV.add("序号");
 		columnNameV.add("编号");
 		columnNameV.add("班级名");
-		columnNameV.add("学院");
+		columnNameV.add("专业");
 		columnNameV.add("描述");
 											
 		tableValueV=new Vector<Vector<Object>>();//创建数据向量
@@ -222,11 +199,11 @@ public class TeamFrame extends JFrame {
 		}
 		//创建面板，在该面板中实现带行标题栏的表格
 		aim=new MFixedColumnTable(columnNameV, tableValueV, 1);
-		aim.setBorder(new EmptyBorder(50, 50, 10, 50));
+		aim.setBorder(new EmptyBorder(10, 10, 10, 10));
 		mainData.add(aim, BorderLayout.CENTER);
 		JTable f=aim.getFixedColumnTable();
 		TableColumnModel c=aim.getFloatingColumnTable().getColumnModel();
-		c.getColumn(4).setPreferredWidth(400);
+		c.getColumn(3).setPreferredWidth(400);
 		fixed=f.getSelectionModel();
 		fixed.addListSelectionListener(new MyListener());
 		//复制 end
@@ -307,6 +284,14 @@ public class TeamFrame extends JFrame {
 						
 					}
 				});
+				courseAdd.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						CourseFrame courseFrame=new CourseFrame(manager);
+						setVisible(false);
+					}
+				});
 				//点击角色管理
 				roleAdd.addActionListener(new ActionListener() {
 					
@@ -316,20 +301,17 @@ public class TeamFrame extends JFrame {
 						setVisible(false);
 					}
 				});
-		DAO dao=new DAO();
-		String[] str={"id"};
-		List<List<Object>> tl=dao.query("select id from major where name='"+majorName.getSelectedItem()+"';", str);
-		for(List<Object> l:tl){
-			majorId=(String)l.get(0);
-		}
 		submit.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				DAO dao=new DAO();
 				String sql="insert into team(id,name,majorId,status)"
-						+ "values('"+createId()+"','"+teamName.getText()+"','"+majorName.getSelectedItem()+"','"+textArea.getText()+"')";
-				if(majorId.equals("")||majorId==null){
+						+ "values('"+createId()+"'"
+								+ ",'"+name.getText()+"',"
+										+ "'"+majorId.get(majorName.getSelectedIndex())+"',"
+												+ "'"+textArea.getText()+"')";
+				if(majorId.get(majorName.getSelectedIndex()).equals("")||majorId.get(majorName.getSelectedIndex())==null){
 					Message message=new Message("专业为空，请添加相应专业！");
 					message.pack();
 				}else{
@@ -346,8 +328,8 @@ public class TeamFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				DAO dao=new DAO();
-				String sql="update team set name='"+teamName.getText()+"',"
-						+ "majorId='"+majorId+"',status='"+textArea.getText()+"' where id='"+id+"';";
+				String sql="update team set name='"+name.getText()+"',"
+						+ "majorId='"+majorId.get(majorName.getSelectedIndex())+"',status='"+textArea.getText()+"' where id='"+id+"';";
 				if(majorId.equals("")||majorId==null){
 					Message message=new Message("专业为空，请添加相应专业！");
 					message.pack();
@@ -365,13 +347,14 @@ public class TeamFrame extends JFrame {
 	public void initData(){
 		DAO dao=new DAO();
 		String[] key={"编号","班级","专业","描述"};
-		String[] values={"id","team.name","major.name","team.status"};
-		list=dao.query("select team.id,major.name,team.status from team"
-				+ ",major where major.id in(select team.majorId from team);", values, key);
-		if(!list.isEmpty()){
+		String[] values={"team.id","team.name","major.name","team.status"};
+		list=dao.query("select team.id,team.name,major.name,team.status from team,major where team.majorId=major.id", values, key);
+		if(!list.isEmpty()&&list.size()>0){
 			int c=0;
+			System.out.println("a101");
 			tableValueV.clear();
-			for(int row=1;row<list.size();row++){
+			for(int row=0;row<list.size();row++){
+				System.out.println("a102");
 				Vector<Object> rowV=new Vector<Object>();				//创建行向量
 				rowV.add(row);
 				for(Map<String,Object> m:list){
@@ -384,11 +367,18 @@ public class TeamFrame extends JFrame {
 				tableValueV.add(rowV);									//把行向量添加到数据向量
 			}
 		}
-		int[] x={1};
-		List<List<Object>> ls=dao.query("select name from college;", x);
+		System.out.println("a103");
+		majorId=new ArrayList<String>();
+		String[] values1={"id","name"};
+		String key1[]={"id","name"};
+		List<Map<String,Object>> ls=dao.query("select id,name from major;", values1,key1);
 		if(!ls.isEmpty()){
-			for(List<Object> l:ls){
-				majorName.addItem(l.get(0));
+			int c=0;
+			for(Map<String,Object> l:ls){
+				majorName.addItem(l.get("name"+c));
+				majorId.add((String)l.get("id"+c));
+				System.out.println(l.get("name"+c)+"--name");
+				c++;
 			}
 		}
 	}
@@ -403,9 +393,10 @@ public class TeamFrame extends JFrame {
 			list.add(tableValueV.get(f).get(1));
 			list.add(tableValueV.get(f).get(2));
 			list.add(tableValueV.get(f).get(3));
-			id=list.get(0).toString();
-			teamName.setText(list.get(1).toString());
-			textArea.setText(list.get(3).toString());			
+			list.add(tableValueV.get(f).get(4));
+			id=list.get(1).toString();
+			name.setText((String)list.get(2));
+			textArea.setText((String)list.get(4));			
 					
 		}
 	}
@@ -426,9 +417,9 @@ public class TeamFrame extends JFrame {
 		   DAO dao=new DAO();
 		   String[] x={"id"};
 		   List<List<Object>> list=dao.query("select Max(id) as id from team;", x);
-		   if(!list.isEmpty()){
+		   if(!list.isEmpty()&&list.get(0).get(0)!=null){
 			   String id=list.get(0).get(0).toString();
-			   String subId=id.substring(3);
+			   String subId=id.substring(4);
 			   return "team"+String.valueOf(Integer.parseInt(subId)+1);
 		   }else{
 			   return "team1001";
@@ -437,13 +428,14 @@ public class TeamFrame extends JFrame {
 	   public void update(){
 		   DAO dao=new DAO();
 			String[] key={"编号","班级","专业","描述"};
-			String[] values={"id","team.name","major.name","team.status"};
-			list=dao.query("select team.id,major.name,team.status from team"
-					+ ",major where major.id in(select team.majorId from team);", values, key);
-			if(!list.isEmpty()){
+			String[] values={"team.id","team.name","major.name","team.status"};
+			list=dao.query("select team.id,team.name,major.name,team.status from team,major where team.majorId=major.id", values, key);
+			if(!list.isEmpty()&&list.size()>0){
 				int c=0;
+				System.out.println("a101");
 				tableValueV.clear();
-				for(int row=1;row<list.size();row++){
+				for(int row=0;row<list.size();row++){
+					System.out.println("a102");
 					Vector<Object> rowV=new Vector<Object>();				//创建行向量
 					rowV.add(row);
 					for(Map<String,Object> m:list){
