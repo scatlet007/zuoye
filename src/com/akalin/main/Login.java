@@ -179,7 +179,7 @@ public class Login extends JFrame {
 				}else if(roleName.equals("ΩÃ ¶")){
 					String sql="select * from teacher where name='"+user+"'and password='"+pwds+"';";
 					List<List<Object>> list=dao.query(sql, str);
-					if(!list.isEmpty()){
+					if(!list.isEmpty()&&list.size()>0){
 						TeacherMain teacherMain=new TeacherMain(user);
 						teacherMain.pack();
 					}else{

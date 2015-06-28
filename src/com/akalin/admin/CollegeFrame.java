@@ -24,6 +24,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumnModel;
 
 import com.akalin.dao.DAO;
+import com.akalin.tool.DateChooserJButton;
 import com.akalin.tool.GetDate;
 import com.akalin.tool.GetTime;
 import com.akalin.tool.Message;
@@ -61,6 +62,7 @@ public class CollegeFrame extends JFrame {
 	private JMenuItem roleAdd;
 	private String manager;
 	private String id;
+	private DateChooserJButton dateChooserJButton;
 	/**
 	 * Create the frame.
 	 */
@@ -142,9 +144,8 @@ public class CollegeFrame extends JFrame {
 		JLabel createTime = new JLabel("创立时间");
 		p1.add(createTime);
 		
-		creates = new JTextField();
-		creates.setColumns(10);
-		p1.add(creates);
+		dateChooserJButton=new DateChooserJButton();
+		p1.add(dateChooserJButton);
 		
 		JPanel p2=new JPanel();
 		panel_1.add(p2,BorderLayout.CENTER);
@@ -222,7 +223,7 @@ public class CollegeFrame extends JFrame {
 				list.add(tableValueV.get(f).get(3));
 				id=list.get(0).toString();
 				collegeName.setText(list.get(1).toString());
-				creates.setText(list.get(2).toString());
+				dateChooserJButton.setText(list.get(2).toString());
 				details.setText(list.get(3).toString());
 				thename=list.get(1).toString();
 				thecreate=list.get(2).toString();
@@ -318,7 +319,7 @@ public class CollegeFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				DAO dao=new DAO();
 				String sql="insert into college(id,name,createTime,status) values"
-						+ "('"+createId()+"','"+collegeName.getText()+"','"+creates.getText()+"','"+details.getText()+"');";
+						+ "('"+createId()+"','"+collegeName.getText()+"','"+dateChooserJButton.getText()+"','"+details.getText()+"');";
 				if(dao.add(sql)==1){
 					Message message=new Message("执行成功！");
 					message.pack();
@@ -332,7 +333,7 @@ public class CollegeFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				DAO dao=new DAO();
-				String sql="update college set name='"+collegeName.getText()+"',createTime='"+creates.getText()+"',status='"+details.getText()+"' where id='"+id+"'";
+				String sql="update college set name='"+collegeName.getText()+"',createTime='"+dateChooserJButton.getText()+"',status='"+details.getText()+"' where id='"+id+"'";
 				if(dao.modify(sql)==1){
 					Message message=new Message("执行成功！");
 					message.pack();
@@ -349,7 +350,7 @@ public class CollegeFrame extends JFrame {
 		if(!list.isEmpty()){
 			tableValueV.clear();
 			int c=0;
-			for(int row=1;row<list.size();row++){
+			for(int row=0;row<list.size();row++){
 				Vector<Object> rowV=new Vector<Object>();				//创建行向量
 				for(Map<String,Object> m:list){
 					rowV.add(m.get("编号"+c));

@@ -2,6 +2,7 @@ package com.akalin.dao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 public class Conn {
@@ -25,13 +26,18 @@ public class Conn {
 	//获得数据库连接
 	public boolean getConnection(){
 		try{
-			String driver="com.mysql.jdbc.Driver";			//数据库接口类名
-			String url="jdbc:mysql://127.0.0.1/zuoye";	//数据库连接地址
-			String user="root";							//数据库连接用户名
-			String password="12345";						//数据库连接密码
-			Class.forName(driver);
+			String driver="com.microsoft.sqlserver.jdbc.SQLServerDriver";			//数据库接口类名
+			String url="jdbc:sqlserver://127.0.0.1:1433;DatabaseName=zuoye";	//数据库连接地址
+			String user="sa";							//数据库连接用户名
+			String password="123456";						//数据库连接密码
+			try {
+				Class.forName(driver);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+				System.out.println("classNoFound");
+			}
 			this.setConnection(DriverManager.getConnection(url, user, password));
-		}catch(Exception e){
+		}catch(SQLException e){
 			e.printStackTrace();
 			return false;
 		}

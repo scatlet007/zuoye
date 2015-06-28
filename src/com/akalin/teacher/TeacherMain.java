@@ -87,9 +87,12 @@ public class TeacherMain extends JFrame {
 	private JComboBox theFunction;
 	private List<String> fid;
 	private JPanel check;
-	/**
+	private int average=0; //平均成绩
+	private int sub=0; //及格人数
+	private int all=0;//总成绩
+/*	*//**
 	 * Launch the application.
-	 */
+	 *//*
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -102,7 +105,7 @@ public class TeacherMain extends JFrame {
 			}
 		});
 	}
-	
+	*/
 	/**
 	 * Create the frame.
 	 */
@@ -266,10 +269,10 @@ public class TeacherMain extends JFrame {
 		JLabel lblNewLabel = new JLabel("");
 		panel.add(lblNewLabel);
 		
-		JLabel nowCredit = new JLabel("及格人数：");
+		JLabel nowCredit = new JLabel("及格人数："+sub);
 		panel.add(nowCredit);
 		
-		JLabel averige = new JLabel("平均成绩：");
+		JLabel averige = new JLabel("平均成绩："+average);
 		panel.add(averige);
 		
 		JPanel bottom = new JPanel();
@@ -295,6 +298,7 @@ public class TeacherMain extends JFrame {
 		time.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		bottom.add(time);
 		this.setTimer(time);
+		setVisible(true);
 	}
 	//设置Timer 1000ms实现一次动作 实际是一个线程   
 		 private void setTimer(JLabel time){   
@@ -367,7 +371,7 @@ public class TeacherMain extends JFrame {
 				DAO dao=new DAO();
 				String key[]={"作业","期中","平时","期末"};
 				String values[]={"task","mid","pacific","final"};
-				String sql="select task,mid,pacific,final from function where id='"+fid.get(theFunction.getSelectedIndex())+"'";
+				String sql="select task,mid,pacific,final from myfunction where id='"+fid.get(theFunction.getSelectedIndex())+"'";
 				list=dao.query(sql, values, key);
 				if(!list.isEmpty()&&list.size()>0){
 					int c=0;
@@ -434,10 +438,13 @@ public class TeacherMain extends JFrame {
 								rowV.add(calCredit((int)m.get("成绩"+c)));
 								rowV.add(calCredit((int)m.get("成绩"+c))+(int)m.get("学分"+c));
 								rowV.add(m.get("班级"+c));
+								if(60>=(int)m.get("成绩"+c))sub++;
+								all=all+(int)m.get("成绩"+c);
 							}
 							c++;
 							tableValueV.add(rowV);
 						}//把行向量添加到数据向量
+						average=all/mlist.size();
 					}
 				}
 			}
@@ -489,10 +496,13 @@ public class TeacherMain extends JFrame {
 								rowV.add(calCredit((int)m.get("成绩"+c)));
 								rowV.add(calCredit((int)m.get("成绩"+c))+(int)m.get("学分"+c));
 								rowV.add(m.get("班级"+c));
+								if(60>=(int)m.get("成绩"+c))sub++;
+								all=all+(int)m.get("成绩"+c);
 							}
 							c++;
 							tableValueV.add(rowV);
 						}//把行向量添加到数据向量
+						average=all/mlist.size();
 					}
 				}
 			}
@@ -534,10 +544,13 @@ public class TeacherMain extends JFrame {
 									rowV.add(calCredit((int)m.get("成绩"+c)));
 									rowV.add(calCredit((int)m.get("成绩"+c))+(int)m.get("学分"+c));
 									rowV.add(team);
+									if(60>=(int)m.get("成绩"+c))sub++;
+									all=all+(int)m.get("成绩"+c);
 								}
 								c++;
 								tableValueV.add(rowV);									//把行向量添加到数据向量
 							}
+							average=all/list.size();
 					}
 				}
 				}
@@ -627,10 +640,13 @@ public class TeacherMain extends JFrame {
 						rowV.add(calCredit((int)m.get("成绩"+c)));
 						rowV.add(calCredit((int)m.get("成绩"+c))+(int)m.get("学分"+c));
 						rowV.add(m.get("班级"+c));
+						if(60>=(int)m.get("成绩"+c))sub++;
+						all=all+(int)m.get("成绩"+c);
 					}
 					c++;
 					tableValueV.add(rowV);
 				}//把行向量添加到数据向量
+				average=all/mlist.size();
 			}
 		}
 		String s[]={"course.id","course.name"};
@@ -686,10 +702,13 @@ public class TeacherMain extends JFrame {
 						rowV.add(calCredit((int)m.get("成绩"+c)));
 						rowV.add(calCredit((int)m.get("成绩"+c))+(int)m.get("学分"+c));
 						rowV.add(m.get("班级"+c));
+						if(60>=(int)m.get("成绩"+c))sub++;
+						all=all+(int)m.get("成绩"+c);
 					}
 					c++;
 					tableValueV.add(rowV);
 				}//把行向量添加到数据向量
+				average=all/mlist.size();
 			}
 		}
 	}

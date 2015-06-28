@@ -82,7 +82,7 @@ public class Function extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				DAO dao=new DAO();
-				String sql="insert into function(id,courseId,teamId,teacherId,task,mid,pacific,final) values"
+				String sql="insert into myfunction(id,courseId,teamId,teacherId,task,mid,pacific,final) values"
 						+ "('"+createId()+"''"+courseId.get(course.getSelectedIndex())+"','"+teamId.get(team.getSelectedIndex())+"','"+teacherId+"',"
 								+ "'"+homework.getText()+"','"+middy.getText()+"','"+normal.getText()+"','"+end.getText()+"');";
 				if(dao.add(sql)==1){
@@ -97,7 +97,7 @@ public class Function extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				DAO dao=new DAO();
-				String sql="update function set"
+				String sql="update myfunction set"
 						+ "courseId='"+courseId.get(course.getSelectedIndex())+"',teamId='"+teamId.get(team.getSelectedIndex())+"',teacherId='"+teacherId+"',"
 								+ "task='"+homework.getText()+"',mid='"+middy.getText()+"',pacific='"+normal.getText()+"',final='"+end.getText()+"';";
 				if(dao.modify(sql)==1){
@@ -239,7 +239,7 @@ public class Function extends JFrame {
 		}
 		String key[]={"课程","作业","期中","平时","期末"};
 		String values[]={"course.name","task","mid","pacific","final"};
-		String sql="select course.name,task,mid,pacific,final from course,function where course.id=function.courseId and function.teacherId='"+teacherId+"'";
+		String sql="select course.name,task,mid,pacific,final from course,myfunction where course.id=myfunction.courseId and myfunction.teacherId='"+teacherId+"'";
 		list=dao.query(sql, values, key);
 		if(!list.isEmpty()&&list.size()>0){
 			tableValueV.clear();
@@ -299,7 +299,7 @@ public class Function extends JFrame {
 		}
 		String key[]={"课程","作业","期中","平时","期末"};
 		String values[]={"course.name","task","mid","pacific","final"};
-		String sql="select course.name,task,mid,pacific,final from course,function where course.id=function.courseId and function.teacherId='"+teacherId+"'";
+		String sql="select course.name,task,mid,pacific,final from course,myfunction where course.id=myfunction.courseId and myfunction.teacherId='"+teacherId+"'";
 		list=dao.query(sql, values, key);
 		if(!list.isEmpty()&&list.size()>0){
 			tableValueV.clear();
@@ -322,7 +322,7 @@ public class Function extends JFrame {
 	private String createId(){
 		   DAO dao=new DAO();
 		   String[] x={"id"};
-		   List<List<Object>> list=dao.query("select Max(id) as id from function;", x);
+		   List<List<Object>> list=dao.query("select Max(id) as id from myfunction;", x);
 		   if(!list.isEmpty()&&list.get(0).get(0)!=null){
 			   String id=list.get(0).get(0).toString();
 			   String subId=id.substring(8);

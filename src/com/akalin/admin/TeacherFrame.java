@@ -81,18 +81,18 @@ public class TeacherFrame extends JFrame {
 	/**
 	 * Launch the application.
 	 */
-	/*public static void main(String[] args) {
+	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					TeacherFrame frame = new TeacherFrame();
+					TeacherFrame frame = new TeacherFrame("");
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
-	}*/
+	}
 
 	/**
 	 * Create the frame.
@@ -252,7 +252,7 @@ public class TeacherFrame extends JFrame {
 		for(int row=1;row<30;row++){
 			Vector<Object> rowV=new Vector<Object>();				//创建行向量
 			rowV.add(row);
-			for(int cov=0;cov<7;cov++){
+			for(int cov=0;cov<8;cov++){
 				rowV.add("+");
 			}
 			tableValueV.add(rowV);									//把行向量添加到数据向量
@@ -403,12 +403,12 @@ public class TeacherFrame extends JFrame {
 		public void initData(){
 			DAO dao=new DAO();
 			String[] key={"编号","教师名","性别","年龄","角色","手机号","学院","职位"};
-			String[] values={"teacher.id","teacher.name","sex","age","role.name","telephone","college.name","position"};
-			list=dao.query("select teacher.id,teacher.name,sex,age,role.name,college.name,telephone,position from teacher,role,college where teacher.collegeId=college.id and role.id=teacher.roleId;", values, key);
+			String[] values={"t.id","t.name","sex","age","r.name","telephone","c.name","position"};
+			list=dao.query("select t.id,t.name,sex,age,r.name,c.name,telephone,position from teacher t,role r,college c where t.collegeId=c.id and r.id=t.roleId;", values, key);
 			if(!list.isEmpty()){
 				tableValueV.clear();
 				int c=0;
-				for(int row=1;row<list.size();row++){
+				for(int row=0;row<list.size();row++){
 					Vector<Object> rowV=new Vector<Object>();				//创建行向量
 					rowV.add(row);
 					for(Map<String,Object> m:list){
@@ -505,12 +505,12 @@ public class TeacherFrame extends JFrame {
 		   private void update(){
 			   DAO dao=new DAO();
 				String[] key={"编号","教师名","性别","年龄","角色","手机号","学院","职位"};
-				String[] values={"teacher.id","teacher.name","sex","age","role.name","telephone","college.name","position"};
-				list=dao.query("select teacher.id,teacher.name,sex,age,role.name,college.name,telephone,position from teacher,role,college where teacher.collegeId=college.id and role.id=teacher.roleId;", values, key);
+				String[] values={"t.id","t.name","sex","age","r.name","telephone","c.name","position"};
+				list=dao.query("select t.id,t.name,sex,age,r.name,c.name,telephone,position from teacher t,role r,college c where t.collegeId=c.id and r.id=t.roleId;;", values, key);
 				if(!list.isEmpty()){
 					tableValueV.clear();
 					int c=0;
-					for(int row=1;row<list.size();row++){
+					for(int row=0;row<list.size();row++){
 						Vector<Object> rowV=new Vector<Object>();				//创建行向量
 						rowV.add(row);
 						for(Map<String,Object> m:list){

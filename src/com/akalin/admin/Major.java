@@ -30,6 +30,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JButton;
 
 import com.akalin.dao.DAO;
+import com.akalin.tool.DateChooserJButton;
 import com.akalin.tool.GetDate;
 import com.akalin.tool.GetTime;
 import com.akalin.tool.Message;
@@ -82,6 +83,7 @@ public class Major extends JFrame {
 	private JComboBox college;
 	private List<String> collegeId;
 	private JTextField createTime;
+	private DateChooserJButton dateChooserJButton;
 	/**
 	 * Create the frame.
 	 */
@@ -244,10 +246,9 @@ public class Major extends JFrame {
 		lblNewLabel.setBounds(276, 65, 78, 15);
 		contentPane.add(lblNewLabel);
 		
-		createTime = new JTextField();
-		createTime.setBounds(364, 62, 123, 21);
-		contentPane.add(createTime);
-		createTime.setColumns(10);
+		dateChooserJButton=new DateChooserJButton();
+		dateChooserJButton.setBounds(364, 62, 123, 21);
+		contentPane.add(dateChooserJButton);
 		setVisible(true);
 	}
 	public void myEvent(){
@@ -323,7 +324,7 @@ public class Major extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				DAO dao=new DAO();
 				String sql="insert into major(id,name,createTime,collegeId,status)"
-						+ "values('"+createId()+"','"+majorName.getText()+"','"+createTime.getText()+"','"+collegeId.get(college.getSelectedIndex())+"','"+status.getText()+"')";
+						+ "values('"+createId()+"','"+majorName.getText()+"','"+dateChooserJButton.getText()+"','"+collegeId.get(college.getSelectedIndex())+"','"+status.getText()+"')";
 				if(college.getSelectedItem().equals("")||college.getSelectedItem()==null){
 					Message message=new Message("学院为空，请添加相应的学院");
 					message.pack();
@@ -341,7 +342,7 @@ public class Major extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				DAO dao=new DAO();
-				String sql="update major set name='"+majorName.getText()+"',createTime='"+createTime.getText()+"',collegeId='"+collegeId.get(college.getSelectedIndex())+"',status='"+status.getText()+"' where id='"+id+"'";
+				String sql="update major set name='"+majorName.getText()+"',createTime='"+dateChooserJButton.getText()+"',collegeId='"+collegeId.get(college.getSelectedIndex())+"',status='"+status.getText()+"' where id='"+id+"'";
 				if(dao.modify(sql)==1){
 					Message message=new Message("修改成功！");
 					message.pack();
@@ -406,7 +407,7 @@ public class Major extends JFrame {
 			list.add(tableValueV.get(f).get(5));
 			id=list.get(1).toString();
 			majorName.setText(list.get(2).toString());
-			createTime.setText(list.get(3).toString());
+			dateChooserJButton.setText(list.get(3).toString());
 			status.setText(list.get(5).toString());			
 		}
 	}
