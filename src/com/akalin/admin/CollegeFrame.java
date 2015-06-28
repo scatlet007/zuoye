@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -112,18 +113,25 @@ public class CollegeFrame extends JFrame {
 		menuBar.add(roleManager);
 		
 		collegeAdd=new JMenuItem("学院添加");
+		collegeAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		collegeManaer.add(collegeAdd);
 		majorAdd=new JMenuItem("专业添加");
+		majorAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		majorManager.add(majorAdd);
 		teamAdd=new JMenuItem("班级添加"); 
+		teamAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		teamManager.add(teamAdd);
 		teacherAdd=new JMenuItem("教师添加");
+		teacherAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		teacherManager.add(teacherAdd);
 		studentAdd=new JMenuItem("学生添加");
+		studentAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		courseAdd=new JMenuItem("课程添加");
 		courseManager.add(courseAdd);
+		courseAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		studentManager.add(studentAdd);
 		roleAdd=new JMenuItem("角色添加");
+		roleAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		roleManager.add(roleAdd);
 		
 		JPanel panel_1 = new JPanel();
@@ -157,8 +165,10 @@ public class CollegeFrame extends JFrame {
 		details.setColumns(30);
 		p2.add(details);	
 		submit = new JButton("提交");
+		submit.setIcon(new ImageIcon("src/res/icon/add.png"));
 		p2.add(submit);
 		modify = new JButton("修改");
+		modify.setIcon(new ImageIcon("src/res/icon/modify16.png"));
 		p2.add(modify);
 		
 		//复制 start

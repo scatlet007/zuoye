@@ -11,6 +11,7 @@ import javax.swing.JLabel;
 
 import java.awt.Font;
 
+import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
@@ -124,19 +125,27 @@ public class CourseFrame extends JFrame {
 		
 		roleManager = new JMenu("角色管理");
 		menuBar.add(roleManager);
+		
 		collegeAdd=new JMenuItem("学院添加");
+		collegeAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		collegeManager.add(collegeAdd);
 		majorAdd=new JMenuItem("专业添加");
+		majorAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		majorManager.add(majorAdd);
 		teamAdd=new JMenuItem("班级添加"); 
+		teamAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		teamManager.add(teamAdd);
 		teacherAdd=new JMenuItem("教师添加");
+		teacherAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		teacherManager.add(teacherAdd);
 		studentAdd=new JMenuItem("学生添加");
+		studentAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		courseAdd=new JMenuItem("课程添加");
 		courseManager.add(courseAdd);
+		courseAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		studentManager.add(studentAdd);
 		roleAdd=new JMenuItem("角色添加");
+		roleAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		roleManager.add(roleAdd);
 		
 		JLabel course1 = new JLabel("课程名：");
@@ -191,6 +200,7 @@ public class CourseFrame extends JFrame {
 		contentPanel.add(major);
 		
 		submit = new JButton("提交");
+		submit.setIcon(new ImageIcon("src/res/icon/add.png"));
 		submit.setBounds(294, 100, 93, 23);
 		contentPanel.add(submit);
 		
@@ -255,6 +265,7 @@ public class CourseFrame extends JFrame {
 		this.setTimer(time);
 		
 		modify = new JButton("修改");
+		modify.setIcon(new ImageIcon("src/res/icon/modify16.png"));
 		modify.setBounds(557, 104, 93, 23);
 		contentPanel.add(modify);
 		setVisible(true);
@@ -367,8 +378,8 @@ public class CourseFrame extends JFrame {
 		public void initData(){
 			 DAO dao=new DAO();
 			   String[] key={"编号","专业名","课程名","课程分类","考核方式","学分"};
-			   String[] values={"course.id","major.name","course.name","ctype","ctype2","credit"};
-				list=dao.query("select course.id,major.name,course.name,ctype,ctype2,credit from course,major where course.majorId=major.id;", values, key);
+			   String[] values={"courseId","majorName","courseName","ctype","ctype2","credit"};
+				list=dao.query("select c.id courseId,m.name majorName,c.name courseName,ctype,ctype2,credit from course c,major m where c.majorId=m.id;", values, key);
 				if(!list.isEmpty()){
 					int c=0;
 					tableValueV.clear();
@@ -453,8 +464,8 @@ public class CourseFrame extends JFrame {
    public void update(){
 	   DAO dao=new DAO();
 	   String[] key={"编号","专业名","课程名","课程分类","考核方式","学分"};
-	   String[] values={"course.id","major.name","course.name","ctype","ctype2","credit"};
-		list=dao.query("select course.id,major.name,course.name,ctype,ctype2,credit from course,major where course.majorId=major.id;", values, key);
+	   String[] values={"courseId","majorName","courseName","ctype","ctype2","credit"};
+		list=dao.query("select c.id courseId,m.name majorName,c.name courseName,ctype,ctype2,credit from course c,major m where c.majorId=m.id;", values, key);
 		if(!list.isEmpty()){
 			int c=0;
 			tableValueV.clear();

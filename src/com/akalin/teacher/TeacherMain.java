@@ -20,6 +20,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumnModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -258,8 +259,10 @@ public class TeacherMain extends JFrame {
 		addBottom.add(function4);
 		addBottom.add(function4);
 		submit=new JButton("提交");
+		submit.setIcon(new ImageIcon("src/res/icon/add.png"));
 		modify=new JButton("修改");
 		addButton.add(submit);
+		modify.setIcon(new ImageIcon("src/res/icon/modify16.png"));
 		addButton.add(modify);
 		//
 		JPanel panel = new JPanel();
@@ -617,12 +620,12 @@ public class TeacherMain extends JFrame {
 			}
 		}
 		String key[]={"学号","名字","课程","学分","课程分类","考核方式","成绩","班级"};
-		String values[]={"student.id","student.name","course.name","credit","ctype","ctype2","score","team.name"};
+		String values[]={"studentId","studentName","courseName","credit","ctype","ctype2","score","teamName"};
 		List<Map<String,Object>> mlist=new ArrayList<Map<String,Object>>();
 		for(String ids:teamId){
-			String sql="select student.id,student.name,course.name,credit,ctype,ctype2,score,team.name"
-					+ "from student,course,team,grade,team_course"
-					+ "where student.id=grade.studentId and grade.courseId=course.id and course.id=team_course.courseId and team.id=team_course.teamId and team.id='"+ids+"'";
+			String sql="select s.id studentId,s.name studentName,c.name coureName,credit,ctype,ctype2,score,t .name teamName"
+					+ "from student s,course,team t,grade g,team_course tc"
+					+ "where s .id=g.studentId and g.courseId=c.id and c.id=tc.courseId and t.id=tc.teamId and t.id='"+ids+"'";
 			mlist=dao.query(sql, values, key);
 			if(!mlist.isEmpty()&& mlist.get(0)!=null){
 				int c=0;
@@ -650,7 +653,7 @@ public class TeacherMain extends JFrame {
 			}
 		}
 		String s[]={"course.id","course.name"};
-		List<List<Object>> ls=dao.query("select course.name from course,team_course where course.id=team_course.courseId and team_course.teacherId='"+teacherId+"'", str);
+		List<List<Object>> ls=dao.query("select c.name from course c,team_course tc where c.id=tc.courseId and tc.teacherId='"+teacherId+"'", str);
 		if(!ls.isEmpty()&&ls.size()>0){
 			for(List<Object> ll:ls){
 				for(Object obj:ll){
@@ -679,12 +682,12 @@ public class TeacherMain extends JFrame {
 			}
 		}
 		String key[]={"学号","名字","课程","学分","课程分类","考核方式","成绩","班级"};
-		String values[]={"student.id","student.name","course.name","credit","ctype","ctype2","score","team.name"};
+		String values[]={"studentId","studentName","courseName","credit","ctype","ctype2","score","teamName"};
 		List<Map<String,Object>> mlist=new ArrayList<Map<String,Object>>();
 		for(String ids:teamId){
-			String sql="select student.id,student.name,course.name,credit,ctype,ctype2,score,team.name"
-					+ "from student,course,team,grade,team_course"
-					+ "where student.id=grade.studentId and grade.courseId=course.id and course.id=team_course.courseId and team.id=team_course.teamId and team.id='"+ids+"'";
+			String sql="select s.id studentId,s.name studentName,c.name courseName,credit,ctype,ctype2,score,t.name teamName"
+					+ "from student s,course c,team t,grade g,team_course tc"
+					+ "where s.id=g.studentId and g.courseId=c.id and c.id=tc.courseId and t.id=tc.teamId and t.id='"+ids+"'";
 			mlist=dao.query(sql, values, key);
 			if(!mlist.isEmpty()&& mlist.get(0)!=null){
 				int c=0;

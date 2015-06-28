@@ -3,6 +3,7 @@ package com.akalin.admin;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -20,7 +21,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumnModel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
-
 import javax.swing.JTextArea;
 
 import java.awt.Font;
@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.JComboBox;
+
 import com.akalin.dao.DAO;
 import com.akalin.tool.GetDate;
 import com.akalin.tool.GetTime;
@@ -117,19 +118,27 @@ public class TeamFrame extends JFrame {
 		
 		roleManager = new JMenu("角色管理");
 		menuBar.add(roleManager);
+		
 		collegeAdd=new JMenuItem("学院添加");
+		collegeAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		collegeManager.add(collegeAdd);
 		majorAdd=new JMenuItem("专业添加");
+		majorAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		majorManager.add(majorAdd);
 		teamAdd=new JMenuItem("班级添加"); 
+		teamAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		teamManager.add(teamAdd);
 		teacherAdd=new JMenuItem("教师添加");
+		teacherAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		teacherManager.add(teacherAdd);
 		studentAdd=new JMenuItem("学生添加");
+		studentAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		courseAdd=new JMenuItem("课程添加");
 		courseManager.add(courseAdd);
+		courseAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		studentManager.add(studentAdd);
 		roleAdd=new JMenuItem("角色添加");
+		roleAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		roleManager.add(roleAdd);
 		
 		JPanel panel = new JPanel();
@@ -169,10 +178,12 @@ public class TeamFrame extends JFrame {
 		textArea.setRows(50);
 		
 		submit = new JButton("\u63D0\u4EA4");
+		submit.setIcon(new ImageIcon("src/res/icon/add.png"));
 		submit.setBounds(699, 79, 93, 23);
 		panel.add(submit);
 		
 		modify = new JButton("修改");
+		modify.setIcon(new ImageIcon("src/res/icon/modify16.png"));
 		modify.setBounds(699, 112, 93, 23);
 		panel.add(modify);
 		
@@ -347,8 +358,8 @@ public class TeamFrame extends JFrame {
 	public void initData(){
 		DAO dao=new DAO();
 		String[] key={"编号","班级","专业","描述"};
-		String[] values={"team.id","team.name","major.name","team.status"};
-		list=dao.query("select team.id,team.name,major.name,team.status from team,major where team.majorId=major.id", values, key);
+		String[] values={"teamId","teamName","majorName","teamStatus"};
+		list=dao.query("select t.id teamId,t.name teamName,m.name majorName,t.status teamStatus from team t,major m where t.majorId=m.id", values, key);
 		if(!list.isEmpty()&&list.size()>0){
 			int c=0;
 			System.out.println("a101");
@@ -428,8 +439,8 @@ public class TeamFrame extends JFrame {
 	   public void update(){
 		   DAO dao=new DAO();
 			String[] key={"编号","班级","专业","描述"};
-			String[] values={"team.id","team.name","major.name","team.status"};
-			list=dao.query("select team.id,team.name,major.name,team.status from team,major where team.majorId=major.id", values, key);
+			String[] values={"teamId","teamName","majorName","teamStatus"};
+			list=dao.query("select t.id teamId,t.name teamName,m.name majorName,t.status teamStatus from team t,major m where t.majorId=m.id", values, key);
 			if(!list.isEmpty()&&list.size()>0){
 				int c=0;
 				System.out.println("a101");

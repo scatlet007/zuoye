@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -201,7 +202,9 @@ public class Function extends JFrame {
 		bottom.add(label5);
 		bottom.add(end);
 		submit=new JButton("提交");
+		submit.setIcon(new ImageIcon("src/res/icon/add.png"));
 		modify=new JButton("修改");
+		modify.setIcon(new ImageIcon("src/res/icon/modify16.png"));
 		bottom.add(submit);
 		bottom.add(modify);
 		
@@ -238,8 +241,8 @@ public class Function extends JFrame {
 			teacherId=(String)teacherIds.get(0).get(0);
 		}
 		String key[]={"课程","作业","期中","平时","期末"};
-		String values[]={"course.name","task","mid","pacific","final"};
-		String sql="select course.name,task,mid,pacific,final from course,myfunction where course.id=myfunction.courseId and myfunction.teacherId='"+teacherId+"'";
+		String values[]={"courseName","task","mid","pacific","final"};
+		String sql="select c.name courseName,task,mid,pacific,final from course c,myfunction mf where c.id=mf.courseId and mf.teacherId='"+teacherId+"'";
 		list=dao.query(sql, values, key);
 		if(!list.isEmpty()&&list.size()>0){
 			tableValueV.clear();
@@ -259,8 +262,8 @@ public class Function extends JFrame {
 			}
 		}
 		String key2[]={"编号","课程"};
-		String values2[]={"course.id","course.name"};
-		sql="select course.id,course.name from course,team_course where course.id=team_course.courseId and team_course.teacherId='"+teacherId+"'";
+		String values2[]={"courseId","courseName"};
+		sql="select c.id courseId,c.name courseName from course c,team_course tc where c.id=tc.courseId and tc.teacherId='"+teacherId+"'";
 		list=dao.query(sql, values2, key2);
 		if(!list.isEmpty()&&list.size()>0){
 			int c=0;
@@ -273,8 +276,8 @@ public class Function extends JFrame {
 			}
 		}
 		String key3[]={"编号","班级"};
-		String values3[]={"team.id","team.name"};
-		sql="select team.id,team.name from team,team_course where team.id=team_course.teamId and team_course.teacherId='"+teacherId+"'";
+		String values3[]={"teamId","teamName"};
+		sql="select t.id teamId,t.name teamName from team t,team_course tc where t.id=tc.teamId and tc.teacherId='"+teacherId+"'";
 		list=dao.query(sql, values2, key2);
 		if(!list.isEmpty()&&list.size()>0){
 			int c=0;
@@ -298,8 +301,8 @@ public class Function extends JFrame {
 			teacherId=(String)teacherIds.get(0).get(0);
 		}
 		String key[]={"课程","作业","期中","平时","期末"};
-		String values[]={"course.name","task","mid","pacific","final"};
-		String sql="select course.name,task,mid,pacific,final from course,myfunction where course.id=myfunction.courseId and myfunction.teacherId='"+teacherId+"'";
+		String values[]={"courseName","task","mid","pacific","final"};
+		String sql="select c.name courseName,task,mid,pacific,final from course c,myfunction mf where c.id=mf.courseId and mf.teacherId='"+teacherId+"'";
 		list=dao.query(sql, values, key);
 		if(!list.isEmpty()&&list.size()>0){
 			tableValueV.clear();

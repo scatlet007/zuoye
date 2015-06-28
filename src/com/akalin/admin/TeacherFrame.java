@@ -12,6 +12,7 @@ import javax.swing.JLabel;
 
 import java.awt.Font;
 
+import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
@@ -81,7 +82,7 @@ public class TeacherFrame extends JFrame {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -92,7 +93,7 @@ public class TeacherFrame extends JFrame {
 				}
 			}
 		});
-	}
+	}*/
 
 	/**
 	 * Create the frame.
@@ -142,18 +143,25 @@ public class TeacherFrame extends JFrame {
 		menuBar.add(roleManager);
 		
 		collegeAdd=new JMenuItem("学院添加");
+		collegeAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		collegeManager.add(collegeAdd);
 		majorAdd=new JMenuItem("专业添加");
+		majorAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		majorManager.add(majorAdd);
 		teamAdd=new JMenuItem("班级添加"); 
+		teamAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		teamManager.add(teamAdd);
 		teacherAdd=new JMenuItem("教师添加");
+		teacherAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		teacherManager.add(teacherAdd);
 		studentAdd=new JMenuItem("学生添加");
+		studentAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		courseAdd=new JMenuItem("课程添加");
 		courseManager.add(courseAdd);
+		courseAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		studentManager.add(studentAdd);
 		roleAdd=new JMenuItem("角色添加");
+		roleAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		roleManager.add(roleAdd);
 		
 		JLabel name = new JLabel("\u6559\u5E08\u540D\uFF1A");
@@ -229,6 +237,7 @@ public class TeacherFrame extends JFrame {
 		contentPane.add(role);
 		
 		submit = new JButton("提交");
+		submit.setIcon(new ImageIcon("src/res/icon/add.png"));
 		submit.setBounds(655, 104, 93, 23);
 		contentPane.add(submit);
 		
@@ -291,6 +300,7 @@ public class TeacherFrame extends JFrame {
 		this.setTimer(time);
 		
 		modify = new JButton("\u4FEE\u6539");
+		modify.setIcon(new ImageIcon("src/res/icon/modify16.png"));
 		modify.setBounds(770, 108, 93, 23);
 		contentPane.add(modify);
 		setVisible(true);
@@ -403,8 +413,8 @@ public class TeacherFrame extends JFrame {
 		public void initData(){
 			DAO dao=new DAO();
 			String[] key={"编号","教师名","性别","年龄","角色","手机号","学院","职位"};
-			String[] values={"t.id","t.name","sex","age","r.name","telephone","c.name","position"};
-			list=dao.query("select t.id,t.name,sex,age,r.name,c.name,telephone,position from teacher t,role r,college c where t.collegeId=c.id and r.id=t.roleId;", values, key);
+			String[] values={"teacherId","teacherName","sex","age","roleName","telephone","collegeName","position"};
+			list=dao.query("select t.id teacherId,t.name teacherName,sex,age,r.name roleName,c.name collegeName,telephone,position from teacher t,role r,college c where t.collegeId=c.id and r.id=t.roleId;", values, key);
 			if(!list.isEmpty()){
 				tableValueV.clear();
 				int c=0;
@@ -505,8 +515,8 @@ public class TeacherFrame extends JFrame {
 		   private void update(){
 			   DAO dao=new DAO();
 				String[] key={"编号","教师名","性别","年龄","角色","手机号","学院","职位"};
-				String[] values={"t.id","t.name","sex","age","r.name","telephone","c.name","position"};
-				list=dao.query("select t.id,t.name,sex,age,r.name,c.name,telephone,position from teacher t,role r,college c where t.collegeId=c.id and r.id=t.roleId;;", values, key);
+				String[] values={"teacherId","teacherName","sex","age","roleName","telephone","collegeName","position"};
+				list=dao.query("select t.id teacherId,t.name teacherName,sex,age,r.name roleName,c.name collegeName,telephone,position from teacher t,role r,college c where t.collegeId=c.id and r.id=t.roleId;;", values, key);
 				if(!list.isEmpty()){
 					tableValueV.clear();
 					int c=0;

@@ -3,6 +3,7 @@ package com.akalin.admin;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -133,18 +134,25 @@ public class Major extends JFrame {
 		menuBar.add(roleManager);
 		
 		collegeAdd=new JMenuItem("学院添加");
+		collegeAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		collegeManager.add(collegeAdd);
 		majorAdd=new JMenuItem("专业添加");
+		majorAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		majorManager.add(majorAdd);
 		teamAdd=new JMenuItem("班级添加"); 
+		teamAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		teamManager.add(teamAdd);
 		teacherAdd=new JMenuItem("教师添加");
+		teacherAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		teacherManager.add(teacherAdd);
 		studentAdd=new JMenuItem("学生添加");
+		studentAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		courseAdd=new JMenuItem("课程添加");
 		courseManager.add(courseAdd);
+		courseAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		studentManager.add(studentAdd);
 		roleAdd=new JMenuItem("角色添加");
+		roleAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		roleManager.add(roleAdd);
 		
 		majorName1 = new JLabel("\u4E13\u4E1A\u540D:");
@@ -171,10 +179,12 @@ public class Major extends JFrame {
 		scrollPane.setViewportView(status);
 		
 		submit = new JButton("\u63D0\u4EA4");
+		submit.setIcon(new ImageIcon("src/res/icon/add.png"));
 		submit.setBounds(472, 155, 93, 23);
 		contentPane.add(submit);
 		
 		modify = new JButton("\u4FEE\u6539");
+		modify.setIcon(new ImageIcon("src/res/icon/modify16.png"));
 		modify.setBounds(605, 155, 93, 23);
 		contentPane.add(modify);
 		
@@ -355,8 +365,8 @@ public class Major extends JFrame {
 	public void initData(){
 		DAO dao=new DAO();
 		String[] key={"编号","专业名","创建时间","学院","描述"};
-		String[] values={"major.id","major.name","major.createTime","college.name","major.status"};
-		list=dao.query("select major.id,major.name,major.createTime,college.name,major.status from college,major where major.collegeId=college.id", values, key);
+		String[] values={"majorId","majorName","majorCreateTime","collegeName","majorStatus"};
+		list=dao.query("select m.id majorId,m.name majorName,m.createTime majorCreateTime,c.name collegeName,m.status majorStatus from college c,major m where m.collegeId=c.id", values, key);
 		if(!list.isEmpty()){
 			System.out.println("abc");
 			tableValueV.clear();
@@ -439,8 +449,8 @@ public class Major extends JFrame {
 	   public void update(){
 		   DAO dao=new DAO();
 			String[] key={"编号","专业名","创建时间","学院","描述"};
-			String[] values={"major.id","major.name","major.createTime","college.name","major.status"};
-			list=dao.query("select major.id,major.name,major.createTime,college.name,major.status from college,major where major.collegeId=college.id", values, key);
+			String[] values={"majorId","majorName","majorCreateTime","collegeName","majorStatus"};
+			list=dao.query("select m.id majorId,m.name majorName,m.createTime majorCreateTime,c.name collegeName,m.status majorStatus from college c,major m where m.collegeId=c.id", values, key);
 			if(!list.isEmpty()){
 				System.out.println("abc");
 				tableValueV.clear();

@@ -1,9 +1,6 @@
 package com.akalin.main;
 
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,7 +9,6 @@ import java.awt.event.ItemListener;
 import java.util.List;
 
 import javax.swing.ButtonGroup;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -21,8 +17,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-import javax.swing.text.html.ImageView;
-
 import com.akalin.admin.BackPanel;
 import com.akalin.admin.Index;
 import com.akalin.dao.DAO;
@@ -89,14 +83,17 @@ public class Login extends JFrame {
 		ButtonGroup group=new ButtonGroup();
 		group.add(register);
 		group.add(forget);
-		ImageIcon img=new ImageIcon("/res/icon/loginbtn.png");
-		submit=new JButton("提交",img);
+		submit=new JButton("提交");
+		//submit.setContentAreaFilled(false);
+		submit.setIcon(new ImageIcon(Login.class.getResource("/res/icon/sign16.png")));
 		submit.setContentAreaFilled(false);;
-		submit.setBounds(162, 162,70,24);
+		submit.setBounds(162, 162,80,24);
 		//submit.setIcon(UIConfig.getImgUrl("常用交易字.png"));
 		contentPane.add(submit);
 		reset=new JButton("重置");
-		reset.setBounds(234, 162, 70, 24);
+		reset.setIcon(new ImageIcon("src/res/icon/reset16.png"));
+		reset.setContentAreaFilled(false);
+		reset.setBounds(244, 162, 80, 24);
 		contentPane.add(reset);
 		
 		double panelWidth = Toolkit.getDefaultToolkit().getScreenSize().getWidth();  

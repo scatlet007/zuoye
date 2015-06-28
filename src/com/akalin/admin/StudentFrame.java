@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -138,23 +139,26 @@ public class StudentFrame extends JFrame {
 		menuBar.add(roleManager);
 		
 		collegeAdd=new JMenuItem("学院添加");
+		collegeAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		collegeManager.add(collegeAdd);
 		majorAdd=new JMenuItem("专业添加");
+		majorAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		majorManager.add(majorAdd);
 		teamAdd=new JMenuItem("班级添加"); 
+		teamAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		teamManager.add(teamAdd);
 		teacherAdd=new JMenuItem("教师添加");
+		teacherAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		teacherManager.add(teacherAdd);
 		studentAdd=new JMenuItem("学生添加");
+		studentAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		courseAdd=new JMenuItem("课程添加");
 		courseManager.add(courseAdd);
+		courseAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		studentManager.add(studentAdd);
 		roleAdd=new JMenuItem("角色添加");
+		roleAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		roleManager.add(roleAdd);
-		JLabel name = new JLabel("学生名：");
-		name.setFont(new Font("宋体", Font.PLAIN, 14));
-		name.setBounds(10, 58, 56, 15);
-		contentPane.add(name);
 		
 		student = new JTextField();
 		student.setBounds(69, 55, 122, 21);
@@ -203,6 +207,7 @@ public class StudentFrame extends JFrame {
 		contentPane.add(role);
 		
 		submit = new JButton("提交");
+		submit.setIcon(new ImageIcon("src/res/icon/add.png"));
 		submit.setBounds(280, 104, 93, 23);
 		contentPane.add(submit);
 		JPanel mainData = new JPanel();
@@ -265,6 +270,7 @@ public class StudentFrame extends JFrame {
 		this.setTimer(time);
 		
 		modify = new JButton("修改");
+		modify.setIcon(new ImageIcon("src/res/icon/modify16.png"));
 		modify.setBounds(471, 104, 93, 23);
 		contentPane.add(modify);
 		setVisible(true);
@@ -377,8 +383,8 @@ public class StudentFrame extends JFrame {
 	public void initData(){
 		DAO dao=new DAO();
 		String[] key={"编号","学生名","性别","年龄","角色","班级","职位"};
-		String[] values={"s.id","s.name","sex","age","role.name","t.name","position"};
-		list=dao.query("select s.id,s.name,sex,age,r.name,t.name,position from student s"
+		String[] values={"studentId","studentName","sex","age","rolename","tteamName","position"};
+		list=dao.query("select s.id studentId,s.name studentName,sex,age,r.name roleName,t.name teamName,position from student s"
 				+ ",team t,role r where r.id=s.roleId and s.teamId=t.id;", values, key);
 		if(!list.isEmpty()){
 			int c=0;
@@ -480,8 +486,8 @@ public class StudentFrame extends JFrame {
 	   public void update(){
 		   DAO dao=new DAO();
 			String[] key={"编号","学生名","性别","年龄","角色","班级","职位"};
-			String[] values={"s.id","s.name","sex","age","r.name","t.name","position"};
-			list=dao.query("select s.id,s.name,sex,age,r.name,t.name,position from student s"
+			String[] values={"studentId","studentName","sex","age","rolename","tteamName","position"};
+			list=dao.query("select s.id studentId,s.name studentName,sex,age,r.name roleName,t.name teamName,position from student s"
 					+ ",team t,role r where r.id=s.roleId and s.teamId=t.id;", values, key);
 			if(!list.isEmpty()){
 				int c=0;
