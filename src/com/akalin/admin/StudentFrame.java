@@ -225,7 +225,7 @@ public class StudentFrame extends JFrame {
 		for(int row=1;row<30;row++){
 			Vector<Object> rowV=new Vector<Object>();				//创建行向量
 			rowV.add(row);
-			for(int cov=0;cov<7;cov++){
+			for(int cov=0;cov<8;cov++){
 				rowV.add("+");
 			}
 			tableValueV.add(rowV);									//把行向量添加到数据向量
