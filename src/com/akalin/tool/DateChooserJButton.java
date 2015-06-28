@@ -29,10 +29,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.border.LineBorder;
 
 public class DateChooserJButton extends JButton {
- /**
-	 * 
-	 */
-	private static final long serialVersionUID = -2339271095143874896L;
+
 private DateChooser dateChooser = null;
  private String preLabel = "";
  public DateChooserJButton() {
