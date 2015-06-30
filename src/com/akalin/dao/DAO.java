@@ -17,7 +17,17 @@ public class DAO {
 	public int add(String sql){
 		try{
 			Conn conn=new Conn();
-			if(conn.getConnection()){
+			if(conn.getConnection()){			//第一种连接方式sql sever
+				conn.getState();
+				conn.getStatement().executeUpdate(sql);//执行sql语句
+				conn.close();
+				return 1;
+			}else if(conn.getConnection2()){   //第二种连接方式mysql
+				conn.getState();
+				conn.getStatement().executeUpdate(sql);//执行sql语句
+				conn.close();
+				return 1;
+			}else if(conn.getConnection3()){   //第三种连接方式mysql 无密码
 				conn.getState();
 				conn.getStatement().executeUpdate(sql);//执行sql语句
 				conn.close();
@@ -41,6 +51,16 @@ public class DAO {
 				conn.getStatement().executeUpdate(sql);//执行sql语句
 				conn.close();
 				return 1;
+			}else if(conn.getConnection2()){
+				conn.getState();
+				conn.getStatement().executeUpdate(sql);//执行sql语句
+				conn.close();
+				return 1;
+			}else if(conn.getConnection3()){
+				conn.getState();
+				conn.getStatement().executeUpdate(sql);//执行sql语句
+				conn.close();
+				return 1;
 			}else{
 				conn.close();
 				return 2;
@@ -56,6 +76,16 @@ public class DAO {
 		try{
 			Conn conn=new Conn();
 			if(conn.getConnection()){
+				conn.getState();
+				conn.getStatement().executeUpdate(sql);//执行sql语句
+				conn.close();
+				return 1;
+			}else if(conn.getConnection2()){
+				conn.getState();
+				conn.getStatement().executeUpdate(sql);//执行sql语句
+				conn.close();
+				return 1;
+			}else if(conn.getConnection3()){
 				conn.getState();
 				conn.getStatement().executeUpdate(sql);//执行sql语句
 				conn.close();
@@ -83,7 +113,27 @@ public class DAO {
 		List<Object> ls=new ArrayList<Object>();
 		try{
 			Conn conn=new Conn();
-			if(conn.getConnection()){
+			if(conn.getConnection()){			//第一种连接方式
+				conn.getState();
+				ResultSet set=conn.getStatement().executeQuery(sql);//执行sql语句
+				while(set.next()){
+					for(int i=0;i<x.length;i++)
+						ls.add(set.getString(x[i]));
+					list.add(ls);
+				}
+				set.close();
+				conn.close();
+			}else if(conn.getConnection2()){	//第二种连接方式
+				conn.getState();
+				ResultSet set=conn.getStatement().executeQuery(sql);//执行sql语句
+				while(set.next()){
+					for(int i=0;i<x.length;i++)
+						ls.add(set.getString(x[i]));
+					list.add(ls);
+				}
+				set.close();
+				conn.close();
+			}else if(conn.getConnection3()){	//第三种连接方式
 				conn.getState();
 				ResultSet set=conn.getStatement().executeQuery(sql);//执行sql语句
 				while(set.next()){
@@ -114,7 +164,33 @@ public class DAO {
 		Map<String,Object> map=new HashMap<String, Object>();
 		try{
 			Conn conn=new Conn();
-			if(conn.getConnection()){
+			if(conn.getConnection()){		//第一种连接方式
+				conn.getState();
+				ResultSet set=conn.getStatement().executeQuery(sql);//执行sql语句
+				int c=0;
+				while(set.next()){
+					for(int i=0;i<key.length;i++){
+						map.put(key[i]+c, set.getString(values[i]));
+					}
+					c++;
+					list.add(map);
+				}
+				set.close();
+				conn.close();
+			}else if(conn.getConnection2()){	//第二种连接方式
+				conn.getState();
+				ResultSet set=conn.getStatement().executeQuery(sql);//执行sql语句
+				int c=0;
+				while(set.next()){
+					for(int i=0;i<key.length;i++){
+						map.put(key[i]+c, set.getString(values[i]));
+					}
+					c++;
+					list.add(map);
+				}
+				set.close();
+				conn.close();
+			}else if(conn.getConnection3()){	//第三种连接方式
 				conn.getState();
 				ResultSet set=conn.getStatement().executeQuery(sql);//执行sql语句
 				int c=0;
@@ -147,7 +223,27 @@ public class DAO {
 		List<Object> ls=new ArrayList<Object>();
 		try{
 			Conn conn=new Conn();
-			if(conn.getConnection()){
+			if(conn.getConnection()){		//第一种连接方式
+				conn.getState();
+				ResultSet set=conn.getStatement().executeQuery(sql);//执行sql语句
+				while(set.next()){
+					for(int i=0;i<str.length;i++)
+						ls.add(set.getString(str[i]));
+					list.add(ls);
+				}
+				set.close();
+				conn.close();
+			}else if(conn.getConnection2()){ //第二种连接方式
+				conn.getState();
+				ResultSet set=conn.getStatement().executeQuery(sql);//执行sql语句
+				while(set.next()){
+					for(int i=0;i<str.length;i++)
+						ls.add(set.getString(str[i]));
+					list.add(ls);
+				}
+				set.close();
+				conn.close();
+			}else if(conn.getConnection3()){ //第三种连接方式
 				conn.getState();
 				ResultSet set=conn.getStatement().executeQuery(sql);//执行sql语句
 				while(set.next()){

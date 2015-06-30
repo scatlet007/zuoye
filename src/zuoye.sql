@@ -6,7 +6,7 @@ CREATE TABLE college(
 	id VARCHAR(36) PRIMARY KEY,
 	name VARCHAR(20) NOT NULL,
 	createTime DATE NOT NULL ,
-	status VARCHAR(200) NULL ,
+	status VARCHAR(200) NULL 
 );
 
 CREATE TABLE major(
@@ -112,3 +112,7 @@ CREATE TABLE admin(
 	name VARCHAR(20) NOT NULL ,
 	password VARCHAR(20) NOT NULL 
 );
+
+create login  root  with password=¡®123456¡¯;
+create user zuoye_root from login root;
+sp_addrolemember 'db_owner','zuoye_root';
