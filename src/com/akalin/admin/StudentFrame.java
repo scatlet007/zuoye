@@ -533,7 +533,7 @@ public class StudentFrame extends JFrame {
 	public void initData(){
 		DAO dao=new DAO();
 		String[] key={"学号","学生名","性别","年龄","角色","班级","职位"};
-		String[] values={"studentId","studentName","sex","age","rolename","tteamName","position"};
+		String[] values={"studentId","studentName","sex","age","rolename","teamName","position"};
 		list=dao.query("select s.id studentId,s.name studentName,sex,age,r.name roleName,t.name teamName,position from student s"
 				+ ",team t,role r where r.id=s.roleId and s.teamId=t.id;", values, key);
 		if(!list.isEmpty()){
@@ -636,7 +636,7 @@ public class StudentFrame extends JFrame {
 	   public void update(){
 		   DAO dao=new DAO();
 			String[] key={"编号","学生名","性别","年龄","角色","班级","职位"};
-			String[] values={"studentId","studentName","sex","age","rolename","tteamName","position"};
+			String[] values={"studentId","studentName","sex","age","rolename","teamName","position"};
 			list=dao.query("select s.id studentId,s.name studentName,sex,age,r.name roleName,t.name teamName,position from student s"
 					+ ",team t,role r where r.id=s.roleId and s.teamId=t.id;", values, key);
 			if(!list.isEmpty()){
