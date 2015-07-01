@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -30,6 +32,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
@@ -65,7 +69,6 @@ public class StudentFrame extends JFrame {
 	private String manager;
 	private List<Map<String,Object>> list;
 	private ListSelectionModel fixed;
-	private int flag=0;
 	private MFixedColumnTable aim;
 	private Vector<Vector<Object>> tableValueV;
 	private String id;
@@ -75,6 +78,18 @@ public class StudentFrame extends JFrame {
 	private JComboBox team;
 	private List<String> teamId;
 	private List<String> roleId;
+	private List<List<Object>> list2=new ArrayList<List<Object>>();
+	private boolean flag=false;
+	private JMenuItem excelInput;
+	private JMenuItem excelOutput;
+	private String path;
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
 	/**
 	 * Launch the application.
 	 */
@@ -155,7 +170,13 @@ public class StudentFrame extends JFrame {
 		courseAdd=new JMenuItem("课程添加");
 		courseManager.add(courseAdd);
 		courseAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
+		excelInput=new JMenuItem();
+		excelInput.setText("Excel数据导入");
+		excelOutput=new JMenuItem();
+		excelOutput.setText("导出Excel文件");
 		studentManager.add(studentAdd);
+		studentManager.add(excelInput);
+		studentManager.add(excelOutput);
 		roleAdd=new JMenuItem("角色添加");
 		roleAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		roleManager.add(roleAdd);
@@ -343,24 +364,117 @@ public class StudentFrame extends JFrame {
 						setVisible(false);
 					}
 				});
+				//导入Excel数据
+				excelInput.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						open(e);
+						File file=new File(path);
+						com.akalin.tool.ExcelOpt excelOpt=new com.akalin.tool.ExcelOpt();
+						String[] columnName={"姓名","性别","年龄","手机号","职位","班级","角色"};
+						list2=excelOpt.readExcel(file, columnName);
+						flag=true;
+						if(list2!=null){
+							tableValueV.clear();
+							for(int row=1;row<list.size();row++){
+								Vector<Object> rowV=new Vector<Object>();
+								for(List<Object>ls:list2){
+									rowV.add("");
+									rowV.add("");
+									rowV.add(ls.get(0));
+									rowV.add(ls.get(1));
+									rowV.add(ls.get(2));
+									rowV.add(ls.get(3));
+									rowV.add(ls.get(4));
+									rowV.add(ls.get(5));
+									rowV.add(ls.get(6));
+								}
+								tableValueV.add(rowV);
+							}
+						}
+					}
+				});
+				excelOutput.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						list2.clear();
+						for(Vector<Object> ss:tableValueV){
+							List<Object> ll=new ArrayList<Object>();
+							for(int i=0;i<9;i++){
+								ll.add(ss.get(i));
+								System.out.print(ss.get(i)+"\t");
+							}
+							System.out.println();
+							list2.add(ll);
+						}
+						button(e);
+						String[] columnName={"序号","编号","姓名","性别","年龄","手机号","职位","班级","角色"};
+						com.akalin.tool.ExcelOpt excelOpt=new com.akalin.tool.ExcelOpt();
+						excelOpt.writeExcelBo(path, columnName, list2);
+						for(int i=0;i<list2.size();i++){
+							//循环读取每一单元格的值
+							for(int j=0;j<9;j++){
+								//向外写单元格的值
+								System.out.print((String)list2.get(i).get(j));
+							}
+							System.out.println();
+						}
+					}
+				});
 		DAO dao=new DAO();
 		submit.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				DAO dao=new DAO();
-				String sql="insert into student(id,name,password,sex,age,teamId,roleId)"
-						+ "values('"+createId()+"','"+student.getText()+"','123456','"+sex.getSelectedItem()+"','"+age.getText()+"',"
-								+ "'"+teamId.get(team.getSelectedIndex())+"','"+roleId.get(role.getSelectedIndex())+"')";
-				if(teamId==null||teamId.equals("")){
-					Message message=new Message("班级为空，请添加相应班级！");
-					message.pack();
-				}else{
-					if(dao.add(sql)==1){
-						Message message=new Message("添加成功！");
+				if(!flag){
+					String sql="insert into student(id,name,password,sex,age,teamId,roleId)"
+							+ "values('"+createId()+"','"+student.getText()+"','123456','"+sex.getSelectedItem()+"','"+age.getText()+"',"
+									+ "'"+teamId.get(team.getSelectedIndex())+"','"+roleId.get(role.getSelectedIndex())+"')";
+					if(teamId==null||teamId.equals("")){
+						Message message=new Message("班级为空，请添加相应班级！");
 						message.pack();
-						update();
+					}else{
+						if(dao.add(sql)==1){
+							Message message=new Message("添加成功！");
+							message.pack();
+							update();
+						}
 					}
+				}else{
+					int[] x={1};
+					for(int i=1;i<list2.size();i++){
+						if(dao.query("select * from team where name='"+list2.get(i).get(5)+"'", x).size()==0){
+							Message message=new Message("还没有名为"+list2.get(i).get(5)+"的班级");
+							message.pack();
+						}else{
+							if(dao.query("select * from role where name='"+list2.get(i).get(6)+"'", x).size()==0){
+								Message message=new Message("还没有名为"+list2.get(i).get(6)+"的角色");
+								message.pack();
+							}else{
+								List<List<Object>> listt=dao.query("select * from team where name='"+list2.get(i).get(5)+"'", x);
+								List<List<Object>> listt2=dao.query("select * from role where name='"+list2.get(i).get(6)+"'", x);
+								String ai="";
+								String am="";
+								if(listt.size()>0&&listt.get(0).get(0)!=null){
+									ai=(String)listt.get(0).get(0);
+								}
+								if(listt.size()>0&&listt2.get(0).get(0)!=null){
+									am=(String)listt2.get(0).get(0);
+								}
+								String sql="insert into student(id,name,password,sex,age,teamId,roleId)"
+										+ "values('"+createId()+"','"+list2.get(i).get(0)+"','123456','"+list2.get(i).get(1)+"','"+list2.get(i).get(2)+"',"
+											+ "'"+ai+"','"+am+"')";
+								dao.add(sql);
+								
+							}
+						}
+					}
+					Message message=new Message("添加成功！");
+					message.pack();
+					update();
 				}
 			}
 		});
@@ -510,4 +624,29 @@ public class StudentFrame extends JFrame {
 				}
 			}
 	   }
+	   protected void button(ActionEvent e){
+			JFileChooser chooser=new JFileChooser();
+			FileFilter filter=new FileNameExtensionFilter("文本类型(.xls)","xls");
+			chooser.setFileFilter(filter);
+			chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+			chooser.setMultiSelectionEnabled(false);
+			int result=chooser.showSaveDialog(this);
+			if(result==JFileChooser.APPROVE_OPTION){
+				File file=chooser.getSelectedFile();
+				this.path=file.getAbsolutePath();
+				System.out.print(this.path);
+			}
+		}
+	  protected void open(ActionEvent e){
+			JFileChooser chooser=new JFileChooser();
+			FileFilter filter=new FileNameExtensionFilter("文本类型(.xls)","xls");
+			chooser.setFileFilter(filter);
+			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			chooser.setMultiSelectionEnabled(false);
+			int result=chooser.showOpenDialog(this);
+			if(result==JFileChooser.APPROVE_OPTION){
+				File file=chooser.getSelectedFile();
+				this.path=file.getAbsolutePath();
+			}
+		}
 }

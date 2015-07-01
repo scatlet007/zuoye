@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,10 +20,13 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableColumnModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
@@ -79,7 +83,6 @@ public class TeacherMain extends JFrame {
 	private JButton modify;//
 	private List<Map<String,Object>> list;
 	private ListSelectionModel fixed;
-	private int flag=0;
 	private MFixedColumnTable aim;
 	private Vector<Vector<Object>> tableValueV;
 	private String manager;
@@ -91,6 +94,18 @@ public class TeacherMain extends JFrame {
 	private int average=0; //平均成绩
 	private int sub=0; //及格人数
 	private int all=0;//总成绩
+	private List<List<Object>> list2=new ArrayList<List<Object>>();
+	private boolean flag=false;
+	private JMenuItem excelInput;
+	private JMenuItem excelOutput;
+	private String path;
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
 /*	*//**
 	 * Launch the application.
 	 *//*
@@ -137,7 +152,14 @@ public class TeacherMain extends JFrame {
 		menuBar.add(start);
 		
 		logout = new JMenuItem("退出");
+		excelInput=new JMenuItem();
+		excelInput.setText("Excel数据导入");
+		excelOutput=new JMenuItem();
+		excelOutput.setText("导出Excel文件");
+		start.add(excelInput);
+		start.add(excelOutput);
 		start.add(logout);
+		
 		
 		JMenu screen = new JMenu("筛选");
 		menuBar.add(screen);
@@ -559,14 +581,102 @@ public class TeacherMain extends JFrame {
 				}
 			}
 		});
+		//导入Excel数据
+		excelInput.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				open(e);
+				File file=new File(path);
+				com.akalin.tool.ExcelOpt excelOpt=new com.akalin.tool.ExcelOpt();
+				String[] columnName={"学号","名字","课程","学分","课程分类","考核方式","成绩","班级"};
+				list2=excelOpt.readExcel(file, columnName);
+				flag=true;
+				if(list2!=null){
+					tableValueV.clear();
+					for(int row=1;row<list.size();row++){
+						Vector<Object> rowV=new Vector<Object>();
+						for(List<Object>ls:list2){
+							rowV.add(ls.get(0));
+							rowV.add(ls.get(1));
+							rowV.add(ls.get(2));
+							rowV.add(ls.get(3));
+							rowV.add(ls.get(4));
+							rowV.add(ls.get(5));
+							rowV.add(ls.get(6));
+							rowV.add(ls.get(7));
+						}
+						tableValueV.add(rowV);
+					}
+				}
+			}
+		});
+		excelOutput.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				list2.clear();
+				for(Vector<Object> ss:tableValueV){
+					List<Object> ll=new ArrayList<Object>();
+					for(int i=0;i<8;i++){
+						ll.add(ss.get(i));
+						System.out.print(ss.get(i)+"\t");
+					}
+					System.out.println();
+					list2.add(ll);
+				}
+				button(e);
+				String[] columnName={"学号","名字","课程","学分","课程分类","考核方式","成绩","班级"};
+				com.akalin.tool.ExcelOpt excelOpt=new com.akalin.tool.ExcelOpt();
+				excelOpt.writeExcelBo(path, columnName, list2);
+				for(int i=0;i<list2.size();i++){
+					//循环读取每一单元格的值
+					for(int j=0;j<8;j++){
+						//向外写单元格的值
+						System.out.print((String)list2.get(i).get(j));
+					}
+					System.out.println();
+				}
+			}
+		});
 		//点击了提交按钮
 		submit.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				DAO dao=new DAO();
-				String sql="insert into grade(studentId,courseId,score) values('"+sno.getText()+"','"+cid.get(course.getSelectedIndex())+"','"+finalScore()+"')";
-				if(dao.add(sql)==1){
+				if(!flag){
+					String sql="insert into grade(studentId,courseId,score) values('"+sno.getText()+"','"+cid.get(course.getSelectedIndex())+"','"+finalScore()+"')";
+					if(dao.add(sql)==1){
+						Message message=new Message("添加成功！");
+						message.pack();
+						update();
+					}
+				}else{
+					int[] x={0};
+					for(int i=1;i<list2.size();i++){
+						if(dao.query("select * from student where name='"+list2.get(i).get(1)+"'", x).size()==0){
+							Message message=new Message("还没有名为"+list2.get(i).get(1)+"的学生");
+							message.pack();
+						}else{
+							if(dao.query("select * from course where name='"+list2.get(i).get(2)+"'", x).size()==0){
+								Message message=new Message("还没有名为"+list2.get(i).get(2)+"的课程");
+								message.pack();
+							}else if(dao.query("select * from team where name='"+list2.get(i).get(7)+"'", x).size()==0){
+								Message message=new Message("还没有名为"+list2.get(i).get(7)+"的班级");
+								message.pack();
+							}else{
+								List<List<Object>> listt=dao.query("select * from course where name='"+list2.get(i).get(2)+"'", x);
+								String ai="";
+								if(listt.size()>0&&listt.get(0).get(0)!=null){
+									ai=(String)listt.get(0).get(0);
+								}
+								String sql="insert into grade(studentId,courseId,score) values('"+list2.get(i).get(0)+"','"+ai+"','"+list2.get(i).get(6)+"')";
+								dao.add(sql);
+								
+							}
+						}
+					}
 					Message message=new Message("添加成功！");
 					message.pack();
 					update();
@@ -742,4 +852,29 @@ public class TeacherMain extends JFrame {
 	public double finalScore(){
 		return Integer.parseInt(te1.getText())*a1+Integer.parseInt(te2.getText())*a2+Integer.parseInt(te3.getText())*a3+Integer.parseInt(te4.getText())*a4;
 	}
+	 protected void button(ActionEvent e){
+			JFileChooser chooser=new JFileChooser();
+			FileFilter filter=new FileNameExtensionFilter("文本类型(.xls)","xls");
+			chooser.setFileFilter(filter);
+			chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+			chooser.setMultiSelectionEnabled(false);
+			int result=chooser.showSaveDialog(this);
+			if(result==JFileChooser.APPROVE_OPTION){
+				File file=chooser.getSelectedFile();
+				this.path=file.getAbsolutePath();
+				System.out.print(this.path);
+			}
+		}
+	  protected void open(ActionEvent e){
+			JFileChooser chooser=new JFileChooser();
+			FileFilter filter=new FileNameExtensionFilter("文本类型(.xls)","xls");
+			chooser.setFileFilter(filter);
+			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			chooser.setMultiSelectionEnabled(false);
+			int result=chooser.showOpenDialog(this);
+			if(result==JFileChooser.APPROVE_OPTION){
+				File file=chooser.getSelectedFile();
+				this.path=file.getAbsolutePath();
+			}
+		}
 }
