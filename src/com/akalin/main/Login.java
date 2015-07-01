@@ -181,7 +181,7 @@ public class Login extends JFrame {
 					List<List<Object>> list=dao.query(sql, str);
 					if(!list.isEmpty()){
 						TeacherMain teacherMain=new TeacherMain(user);
-						teacherMain.pack();
+						setVisible(false);
 					}else{
 						Message message=new Message("无权访问！数据库里应该还没有你的名字！");
 						message.pack();

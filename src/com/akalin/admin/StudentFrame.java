@@ -52,6 +52,7 @@ public class StudentFrame extends JFrame {
 	private JButton submit;
 	private JButton modify;
 	private JTable table;
+	private JTextField sno;
 	private JMenu collegeManager;
 	private JMenu majorManager;
 	private JMenu teamManager;
@@ -66,6 +67,7 @@ public class StudentFrame extends JFrame {
 	private JMenuItem studentAdd;
 	private JMenuItem courseAdd;
 	private JMenuItem roleAdd;
+	private JMenuItem scAdd;
 	private String manager;
 	private List<Map<String,Object>> list;
 	private ListSelectionModel fixed;
@@ -153,6 +155,9 @@ public class StudentFrame extends JFrame {
 		roleManager = new JMenu("角色管理");
 		menuBar.add(roleManager);
 		
+		JMenu scManager=new JMenu("班级课表管理");
+		menuBar.add(scManager);
+		
 		collegeAdd=new JMenuItem("学院添加");
 		collegeAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		collegeManager.add(collegeAdd);
@@ -180,39 +185,45 @@ public class StudentFrame extends JFrame {
 		roleAdd=new JMenuItem("角色添加");
 		roleAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		roleManager.add(roleAdd);
+		scAdd=new JMenuItem("班级课表添加");
+		scManager.add(scAdd);
+		JLabel name = new JLabel("学生名：");
+		name.setFont(new Font("宋体", Font.PLAIN, 14));
+		name.setBounds(175, 58, 56, 15);
+		contentPane.add(name);
 		
 		student = new JTextField();
-		student.setBounds(69, 55, 122, 21);
+		student.setBounds(241, 55, 83, 21);
 		contentPane.add(student);
 		student.setColumns(10);
 		
 		JLabel college = new JLabel("班级名：");
 		college.setFont(new Font("宋体", Font.PLAIN, 14));
-		college.setBounds(218, 58, 69, 15);
+		college.setBounds(334, 58, 69, 15);
 		contentPane.add(college);
 		
 		team = new JComboBox();
 		team.setModel(new DefaultComboBoxModel(new String[] {"信工学院","软件学院","文学院"}));
-		team.setBounds(297, 55, 152, 21);
+		team.setBounds(413, 55, 152, 21);
 		contentPane.add(team);
 		
 		JLabel sex1 = new JLabel("性别");
 		sex1.setFont(new Font("宋体", Font.PLAIN, 14));
-		sex1.setBounds(471, 61, 54, 15);
+		sex1.setBounds(586, 58, 54, 15);
 		contentPane.add(sex1);
 		
 		sex = new JComboBox();
 		sex.setModel(new DefaultComboBoxModel(new String[] {"男","女"}));
-		sex.setBounds(516, 55, 64, 21);
+		sex.setBounds(650, 55, 64, 21);
 		contentPane.add(sex);
 		
 		JLabel age1 = new JLabel("年龄：");
 		age1.setFont(new Font("宋体", Font.PLAIN, 14));
-		age1.setBounds(615, 58, 54, 15);
+		age1.setBounds(724, 58, 54, 15);
 		contentPane.add(age1);
 		
 		age = new JTextField();
-		age.setBounds(661, 55, 66, 21);
+		age.setBounds(788, 55, 66, 21);
 		contentPane.add(age);
 		age.setColumns(10);
 		
@@ -238,7 +249,7 @@ public class StudentFrame extends JFrame {
 		//复制 start
 		Vector<String> columnNameV=new Vector<String>();	//创建列名向量
 		columnNameV.add("序号");
-		columnNameV.add("编号");
+		columnNameV.add("学号");
 		columnNameV.add("姓名");
 		columnNameV.add("性别");
 		columnNameV.add("年龄");
@@ -294,6 +305,15 @@ public class StudentFrame extends JFrame {
 		modify.setIcon(new ImageIcon("src/res/icon/modify16.png"));
 		modify.setBounds(471, 104, 93, 23);
 		contentPane.add(modify);
+		
+		JLabel sno1 = new JLabel("\u5B66\u53F7:");
+		sno1.setBounds(10, 58, 46, 15);
+		contentPane.add(sno1);
+		
+		sno = new JTextField();
+		sno.setBounds(45, 55, 106, 21);
+		contentPane.add(sno);
+		sno.setColumns(10);
 		setVisible(true);
 	}
 	
@@ -364,6 +384,15 @@ public class StudentFrame extends JFrame {
 						setVisible(false);
 					}
 				});
+				scAdd.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						SCFrame scFrame=new SCFrame(manager);
+						setVisible(false);
+						
+					}
+				});
 				//导入Excel数据
 				excelInput.addActionListener(new ActionListener() {
 					
@@ -372,7 +401,7 @@ public class StudentFrame extends JFrame {
 						open(e);
 						File file=new File(path);
 						com.akalin.tool.ExcelOpt excelOpt=new com.akalin.tool.ExcelOpt();
-						String[] columnName={"姓名","性别","年龄","手机号","职位","班级","角色"};
+						String[] columnName={"学号","姓名","性别","年龄","手机号","职位","班级","角色"};
 						list2=excelOpt.readExcel(file, columnName);
 						flag=true;
 						if(list2!=null){
@@ -380,8 +409,7 @@ public class StudentFrame extends JFrame {
 							for(int row=1;row<list.size();row++){
 								Vector<Object> rowV=new Vector<Object>();
 								for(List<Object>ls:list2){
-									rowV.add("");
-									rowV.add("");
+									rowV.add(row);
 									rowV.add(ls.get(0));
 									rowV.add(ls.get(1));
 									rowV.add(ls.get(2));
@@ -389,6 +417,7 @@ public class StudentFrame extends JFrame {
 									rowV.add(ls.get(4));
 									rowV.add(ls.get(5));
 									rowV.add(ls.get(6));
+									rowV.add(ls.get(7));
 								}
 								tableValueV.add(rowV);
 							}
@@ -410,7 +439,7 @@ public class StudentFrame extends JFrame {
 							list2.add(ll);
 						}
 						button(e);
-						String[] columnName={"序号","编号","姓名","性别","年龄","手机号","职位","班级","角色"};
+						String[] columnName={"序号","学号","姓名","性别","年龄","手机号","职位","班级","角色"};
 						com.akalin.tool.ExcelOpt excelOpt=new com.akalin.tool.ExcelOpt();
 						excelOpt.writeExcelBo(path, columnName, list2);
 						for(int i=0;i<list2.size();i++){
@@ -431,13 +460,17 @@ public class StudentFrame extends JFrame {
 				DAO dao=new DAO();
 				if(!flag){
 					String sql="insert into student(id,name,password,sex,age,teamId,roleId)"
-							+ "values('"+createId()+"','"+student.getText()+"','123456','"+sex.getSelectedItem()+"','"+age.getText()+"',"
+							+ "values('"+sno.getText()+"','"+student.getText()+"','123456','"+sex.getSelectedItem()+"','"+age.getText()+"',"
 									+ "'"+teamId.get(team.getSelectedIndex())+"','"+roleId.get(role.getSelectedIndex())+"')";
 					if(teamId==null||teamId.equals("")){
 						Message message=new Message("班级为空，请添加相应班级！");
 						message.pack();
 					}else{
-						if(dao.add(sql)==1){
+						int[] x={1};
+						if(dao.query("select * from student where id='"+sno.getText()+"'", x).size()>0){
+							Message message=new Message("添加失败！学号"+sno.getText()+"已存在");
+							message.pack();
+						}else if(dao.add(sql)==1){
 							Message message=new Message("添加成功！");
 							message.pack();
 							update();
@@ -446,16 +479,19 @@ public class StudentFrame extends JFrame {
 				}else{
 					int[] x={1};
 					for(int i=1;i<list2.size();i++){
-						if(dao.query("select * from team where name='"+list2.get(i).get(5)+"'", x).size()==0){
-							Message message=new Message("还没有名为"+list2.get(i).get(5)+"的班级");
+						if(dao.query("select * from team where name='"+list2.get(i).get(6)+"'", x).size()==0){
+							Message message=new Message("还没有名为"+list2.get(i).get(6)+"的班级");
 							message.pack();
 						}else{
-							if(dao.query("select * from role where name='"+list2.get(i).get(6)+"'", x).size()==0){
-								Message message=new Message("还没有名为"+list2.get(i).get(6)+"的角色");
+							if(dao.query("select * from role where name='"+list2.get(i).get(7)+"'", x).size()==0){
+								Message message=new Message("还没有名为"+list2.get(i).get(7)+"的角色");
+								message.pack();
+							}else if(dao.query("select * from student where id='"+list2.get(i).get(0)+"'", x).size()>0){
+								Message message=new Message("已有学号为"+list2.get(i).get(0)+"的学生");
 								message.pack();
 							}else{
-								List<List<Object>> listt=dao.query("select * from team where name='"+list2.get(i).get(5)+"'", x);
-								List<List<Object>> listt2=dao.query("select * from role where name='"+list2.get(i).get(6)+"'", x);
+								List<List<Object>> listt=dao.query("select * from team where name='"+list2.get(i).get(6)+"'", x);
+								List<List<Object>> listt2=dao.query("select * from role where name='"+list2.get(i).get(7)+"'", x);
 								String ai="";
 								String am="";
 								if(listt.size()>0&&listt.get(0).get(0)!=null){
@@ -465,7 +501,7 @@ public class StudentFrame extends JFrame {
 									am=(String)listt2.get(0).get(0);
 								}
 								String sql="insert into student(id,name,password,sex,age,teamId,roleId)"
-										+ "values('"+createId()+"','"+list2.get(i).get(0)+"','123456','"+list2.get(i).get(1)+"','"+list2.get(i).get(2)+"',"
+										+ "values('"+list2.get(i).get(0)+"','"+list2.get(i).get(1)+"','123456','"+list2.get(i).get(2)+"','"+list2.get(i).get(3)+"',"
 											+ "'"+ai+"','"+am+"')";
 								dao.add(sql);
 								
@@ -496,7 +532,7 @@ public class StudentFrame extends JFrame {
 	//初始化数据
 	public void initData(){
 		DAO dao=new DAO();
-		String[] key={"编号","学生名","性别","年龄","角色","班级","职位"};
+		String[] key={"学号","学生名","性别","年龄","角色","班级","职位"};
 		String[] values={"studentId","studentName","sex","age","rolename","tteamName","position"};
 		list=dao.query("select s.id studentId,s.name studentName,sex,age,r.name roleName,t.name teamName,position from student s"
 				+ ",team t,role r where r.id=s.roleId and s.teamId=t.id;", values, key);
@@ -507,7 +543,7 @@ public class StudentFrame extends JFrame {
 				Vector<Object> rowV=new Vector<Object>();				//创建行向量
 				rowV.add(row);
 				for(Map<String,Object> m:list){
-					rowV.add(m.get("编号"+c));
+					rowV.add(m.get("学号"+c));
 					rowV.add(m.get("学生名"+c));
 					rowV.add(m.get("性别"+c));
 					rowV.add(m.get("年龄"+c));

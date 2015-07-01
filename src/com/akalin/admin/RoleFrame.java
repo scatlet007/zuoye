@@ -59,6 +59,7 @@ public class RoleFrame extends JFrame {
 	private JMenuItem studentAdd;
 	private JMenuItem courseAdd;
 	private JMenuItem roleAdd;
+	private JMenuItem scAdd;
 	private String manager;
 	private JLabel roleName1;
 	private JTextField roleName;
@@ -131,6 +132,9 @@ public class RoleFrame extends JFrame {
 		roleManager = new JMenu("角色管理");
 		menuBar.add(roleManager);
 		
+		JMenu scManager=new JMenu("班级课表管理");
+		menuBar.add(scManager);
+		
 		collegeAdd=new JMenuItem("学院添加");
 		collegeAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		collegeManager.add(collegeAdd);
@@ -158,6 +162,8 @@ public class RoleFrame extends JFrame {
 		roleManager.add(roleAdd);
 		roleManager.add(excelInput);
 		roleManager.add(excelOutput);
+		scAdd=new JMenuItem("班级课表添加");
+		scManager.add(scAdd);
 		
 		roleName1 = new JLabel("\u89D2\u8272\u540D:");
 		roleName1.setFont(new Font("黑体", Font.BOLD, 14));
@@ -311,6 +317,15 @@ public class RoleFrame extends JFrame {
 					public void actionPerformed(ActionEvent e) {
 						RoleFrame roleFrame=new RoleFrame(manager);
 						setVisible(false);
+					}
+				});
+				scAdd.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						SCFrame scFrame=new SCFrame(manager);
+						setVisible(false);
+						
 					}
 				});
 				//导入Excel数据

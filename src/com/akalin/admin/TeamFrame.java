@@ -62,6 +62,7 @@ public class TeamFrame extends JFrame {
 	private JMenuItem studentAdd;
 	private JMenuItem courseAdd;
 	private JMenuItem roleAdd;
+	private JMenuItem scAdd;
 	private String manager;
 	private List<Map<String,Object>> list;
 	private ListSelectionModel fixed;
@@ -134,6 +135,9 @@ public class TeamFrame extends JFrame {
 		roleManager = new JMenu("角色管理");
 		menuBar.add(roleManager);
 		
+		JMenu scManager=new JMenu("班级课表管理");
+		menuBar.add(scManager);
+		
 		collegeAdd=new JMenuItem("学院添加");
 		collegeAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		collegeManager.add(collegeAdd);
@@ -161,6 +165,8 @@ public class TeamFrame extends JFrame {
 		roleAdd=new JMenuItem("角色添加");
 		roleAdd.setIcon(new ImageIcon("src/res/icon/add.png"));
 		roleManager.add(roleAdd);
+		scAdd=new JMenuItem("班级课表添加");
+		scManager.add(scAdd);
 		
 		JPanel panel = new JPanel();
 		panel.setBounds(10, 36, 859, 155);
@@ -331,6 +337,15 @@ public class TeamFrame extends JFrame {
 					public void actionPerformed(ActionEvent e) {
 						RoleFrame roleFrame=new RoleFrame(manager);
 						setVisible(false);
+					}
+				});
+				scAdd.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						SCFrame scFrame=new SCFrame(manager);
+						setVisible(false);
+						
 					}
 				});
 				//导入Excel数据
