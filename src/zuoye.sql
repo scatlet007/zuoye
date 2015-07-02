@@ -435,6 +435,6 @@ insert into myfunction values('8033','3033','7033','2033','15','25','10','50');
 insert into myfunction values('8034','3034','7034','2034','10','10','20','60');
 insert into myfunction values('8035','3035','7035','2035','10','10','20','60');
 
-create login  root  with password=¡®123456¡¯;
+create login  root  with password='123456';
 create user zuoye_root from login root;
 sp_addrolemember 'db_owner','zuoye_root';
