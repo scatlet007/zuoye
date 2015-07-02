@@ -531,9 +531,11 @@ public class TeacherFrame extends JFrame {
 	//初始化数据
 		public void initData(){
 			DAO dao=new DAO();
-			String[] key={"编号","教师名","性别","年龄","角色","手机号","学院","职位"};
-			String[] values={"teacherId","teacherName","sex","age","roleName","telephone","collegeName","position"};
-			list=dao.query("select t.id teacherId,t.name teacherName,sex,age,r.name roleName,c.name collegeName,telephone,position from teacher t,role r,college c where t.collegeId=c.id and r.id=t.roleId;", values, key);
+			String[] key={"编号","教师名","性别","年龄","手机号","学院","职位"};
+			String[] values={"teacherId","teacherName","sex","age","telephone","collegeName","position"};
+			list=dao.query("select t.id teacherId,t.name teacherName,sex,age,c.name collegeName,telephone,position"
+					+ " from teacher t,college c where"
+					+ " t.collegeId=c.id;", values, key);
 			if(!list.isEmpty()){
 				tableValueV.clear();
 				int c=0;
@@ -548,7 +550,7 @@ public class TeacherFrame extends JFrame {
 						rowV.add(m.get("手机号"+c));
 						rowV.add(m.get("职位"+c));
 						rowV.add(m.get("学院"+c));
-						rowV.add(m.get("角色"+c));
+						rowV.add("");
 					}
 					c++;
 					tableValueV.add(rowV);									//把行向量添加到数据向量
@@ -633,9 +635,11 @@ public class TeacherFrame extends JFrame {
 		   }
 		   private void update(){
 			   DAO dao=new DAO();
-				String[] key={"编号","教师名","性别","年龄","角色","手机号","学院","职位"};
-				String[] values={"teacherId","teacherName","sex","age","roleName","telephone","collegeName","position"};
-				list=dao.query("select t.id teacherId,t.name teacherName,sex,age,r.name roleName,c.name collegeName,telephone,position from teacher t,role r,college c where t.collegeId=c.id and r.id=t.roleId;;", values, key);
+				String[] key={"编号","教师名","性别","年龄","手机号","学院","职位"};
+				String[] values={"teacherId","teacherName","sex","age","telephone","collegeName","position"};
+				list=dao.query("select t.id teacherId,t.name teacherName,sex,age,c.name collegeName,telephone,position "
+						+ "from teacher t,college c where"
+						+ " t.collegeId=c.id;", values, key);
 				if(!list.isEmpty()){
 					tableValueV.clear();
 					int c=0;
@@ -650,7 +654,7 @@ public class TeacherFrame extends JFrame {
 							rowV.add(m.get("手机号"+c));
 							rowV.add(m.get("职位"+c));
 							rowV.add(m.get("学院"+c));
-							rowV.add(m.get("角色"+c));
+							rowV.add("");
 						}
 						c++;
 						tableValueV.add(rowV);									//把行向量添加到数据向量

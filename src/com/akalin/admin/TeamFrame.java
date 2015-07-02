@@ -241,7 +241,9 @@ public class TeamFrame extends JFrame {
 		mainData.add(aim, BorderLayout.CENTER);
 		JTable f=aim.getFixedColumnTable();
 		TableColumnModel c=aim.getFloatingColumnTable().getColumnModel();
-		c.getColumn(3).setPreferredWidth(400);
+		c.getColumn(1).setPreferredWidth(200);
+		c.getColumn(2).setPreferredWidth(200);
+		c.getColumn(3).setPreferredWidth(200);
 		fixed=f.getSelectionModel();
 		fixed.addListSelectionListener(new MyListener());
 		//¸´ÖÆ end

@@ -84,7 +84,7 @@ public class Index extends JFrame {
 	public void init(){
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100,100,675, 450);
+		setBounds(100,100,900, 600);
 		this.setLocationRelativeTo(null);//窗口在屏幕中间显示
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -147,8 +147,8 @@ public class Index extends JFrame {
 		scManager.add(scAdd);
 		
 		//添加背景
-		double panelWidth = 675;  
-		double panelHeight =450- 25 - 25 - 20;//(两个25是内外两个窗口标题栏的高度,20是底部更新进度栏的高度)  
+		double panelWidth = 900;  
+		double panelHeight =600- 25 - 25 - 20;//(两个25是内外两个窗口标题栏的高度,20是底部更新进度栏的高度)  
 		backPanel=new BackPanel(panelWidth,panelHeight,"/res/loginImg.jpg");
 		contentPane.add(backPanel,-1);
 		

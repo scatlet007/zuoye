@@ -27,6 +27,7 @@ import com.akalin.admin.BackPanel;
 import com.akalin.admin.Index;
 import com.akalin.dao.DAO;
 import com.akalin.teacher.TeacherMain;
+import com.akalin.teacher.TeacherMain2;
 import com.akalin.tool.Message;
 import com.akalin.userframe.StudentMain;
 
@@ -180,7 +181,7 @@ public class Login extends JFrame {
 					String sql="select * from teacher where name='"+user+"'and password='"+pwds+"';";
 					List<List<Object>> list=dao.query(sql, str);
 					if(!list.isEmpty()){
-						TeacherMain teacherMain=new TeacherMain(user);
+						TeacherMain2 teacherMain=new TeacherMain2(user);
 						setVisible(false);
 					}else{
 						Message message=new Message("无权访问！数据库里应该还没有你的名字！");
