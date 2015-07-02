@@ -67,9 +67,9 @@ public class Function extends JFrame {
 	private String manager;
 	private JButton submit;
 	private JButton modify;
-	private List<String> courseId;
+	private List<String> courseId=new ArrayList<String>();
 	private String teacherId="";
-	private List<String> teamId;
+	private List<String> tId=new ArrayList<String>();
 	
 	public Function(String username) {
 		manager=username;
@@ -84,7 +84,10 @@ public class Function extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				DAO dao=new DAO();
 				String sql="insert into myfunction(id,courseId,teamId,teacherId,task,mid,pacific,final) values"
-						+ "('"+createId()+"''"+courseId.get(course.getSelectedIndex())+"','"+teamId.get(team.getSelectedIndex())+"','"+teacherId+"',"
+						+ "('"+createId()+"'"
+								+ ",'"+courseId.get(course.getSelectedIndex())+"',"
+										+ "'"+tId.get(team.getSelectedIndex())+"',"
+												+ "'"+teacherId+"',"
 								+ "'"+homework.getText()+"','"+middy.getText()+"','"+normal.getText()+"','"+end.getText()+"');";
 				if(dao.add(sql)==1){
 					Message message=new Message("执行成功！");
@@ -99,7 +102,9 @@ public class Function extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				DAO dao=new DAO();
 				String sql="update myfunction set"
-						+ "courseId='"+courseId.get(course.getSelectedIndex())+"',teamId='"+teamId.get(team.getSelectedIndex())+"',teacherId='"+teacherId+"',"
+						+ "courseId='"+courseId.get(course.getSelectedIndex())+"',"
+								+ "teamId='"+tId.get(team.getSelectedIndex())+"',"
+										+ "teacherId='"+teacherId+"',"
 								+ "task='"+homework.getText()+"',mid='"+middy.getText()+"',pacific='"+normal.getText()+"',final='"+end.getText()+"';";
 				if(dao.modify(sql)==1){
 					Message message=new Message("执行成功！");
@@ -258,34 +263,33 @@ public class Function extends JFrame {
 					rowV.add(m.get("期末"+c));
 				}
 				c++;
-				tableValueV.add(rowV);									//把行向量添加到数据向量
+				tableValueV.add(rowV);		//把行向量添加到数据向量
 			}
 		}
-		String key2[]={"编号","课程"};
-		String values2[]={"courseId","courseName"};
-		sql="select c.id courseId,c.name courseName from course c,team_course tc where c.id=tc.courseId and tc.teacherId='"+teacherId+"'";
-		list=dao.query(sql, values2, key2);
-		if(!list.isEmpty()&&list.size()>0){
+		
+		String value[]={"courseId","courseName"};
+		String k[]={"编号","课程"};
+		String sql2="select distinct c.id courseId,c.name courseName from course c,team_course tc where c.id=tc.courseId and tc.teacherId='"+teacherId+"'";
+		List<Map<String,Object>> courseIds=dao.query(sql2, value, k);
+		if(!courseIds.isEmpty()&&courseIds.size()>0){
 			int c=0;
-			for(int row=0;row<list.size();row++){
-				for(Map<String,Object> m:list){
-					course.addItem(m.get("课程"+c).toString());
-					courseId.add((String)m.get("编号"+c));
-				}
+			for(Map<String,Object> obj:courseIds){
+				courseId.add(obj.get("编号"+c).toString());
+				course.addItem(obj.get("课程"+c).toString());
+				System.out.println(obj.get("编号"+c).toString()+"\t"+obj.get("课程"+c).toString());
 				c++;
 			}
 		}
-		String key3[]={"编号","班级"};
-		String values3[]={"teamId","teamName"};
-		sql="select t.id teamId,t.name teamName from team t,team_course tc where t.id=tc.teamId and tc.teacherId='"+teacherId+"'";
-		list=dao.query(sql, values2, key2);
-		if(!list.isEmpty()&&list.size()>0){
+		String[] tid={"teamId","teamName"};
+		String tk[]={"编号","班名"};
+		String sql3="select distinct t.id teamId,t.name teamName from team t,team_course tc where t.id=tc.teamId and tc.teacherId='"+teacherId+"'";
+		List<Map<String,Object>> teamIds=dao.query(sql3, tid, tk);
+		if(!teamIds.isEmpty()&&teamIds.size()>0){
 			int c=0;
-			for(int row=0;row<list.size();row++){
-				for(Map<String,Object> m:list){
-					team.addItem(m.get("班级"+c).toString());
-					teamId.add((String)m.get("编号"+c));
-				}
+			for(Map<String,Object> obj:teamIds){
+				tId.add(obj.get("编号"+c).toString());
+				team.addItem(obj.get("班名"+c).toString());
+				System.out.println(obj.get("编号"+c).toString()+"\t"+obj.get("班名"+c).toString());
 				c++;
 			}
 		}
@@ -294,7 +298,7 @@ public class Function extends JFrame {
 	public void update(){
 		String[] str={"id"};
 		String teacherId="";
-		List<String> teamId=new ArrayList<String>();
+		//List<String> teamId=new ArrayList<String>();
 		DAO dao=new DAO();
 		List<List<Object>> teacherIds=dao.query("select id from teacher where name='"+manager+"'", str);
 		if(!teacherIds.isEmpty()&&teacherIds.get(0).get(0)!=null){

@@ -499,7 +499,7 @@ public class CourseFrame extends JFrame {
 				if(!list.isEmpty()){
 					int c=0;
 					tableValueV.clear();
-					for(int row=1;row<list.size();row++){
+					for(int row=0;row<list.size();row++){
 						Vector<Object> rowV=new Vector<Object>();				//创建行向量
 						rowV.add(row);
 						for(Map<String,Object> m:list){
@@ -585,7 +585,7 @@ public class CourseFrame extends JFrame {
 		if(!list.isEmpty()){
 			int c=0;
 			tableValueV.clear();
-			for(int row=1;row<list.size();row++){
+			for(int row=0;row<list.size();row++){
 				Vector<Object> rowV=new Vector<Object>();				//创建行向量
 				rowV.add(row);
 				for(Map<String,Object> m:list){

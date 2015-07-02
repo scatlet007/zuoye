@@ -206,7 +206,6 @@ public class SCFrame extends JFrame {
 		p1.add(team1);
 		
 		teamName = new JComboBox();
-		teamName.addItem("13计科");
 		p1.add(teamName);
 		
 		JLabel teacher1 = new JLabel("\u6559\u5E08");
@@ -413,9 +412,9 @@ public class SCFrame extends JFrame {
 			}
 			courseId=new ArrayList<String>();
 			List<Map<String,Object>> courses=dao.query("select id,name from course;", values1,key1);
-			if(!ls.isEmpty()){
+			if(!courses.isEmpty()){
 				int c=0;
-				for(Map<String,Object> l:ls){
+				for(Map<String,Object> l:courses){
 					course.addItem(l.get("name"+c));
 					courseId.add((String)l.get("id"+c));
 					c++;
@@ -543,7 +542,7 @@ public class SCFrame extends JFrame {
 						//循环读取每一单元格的值
 						for(int j=0;j<8;j++){
 							//向外写单元格的值
-							System.out.print((String)list2.get(i).get(j));
+							System.out.print(list2.get(i).get(j).toString());
 						}
 						System.out.println();
 					}
@@ -577,7 +576,7 @@ public class SCFrame extends JFrame {
 							}
 							if(p==teamName.getItemCount())teamFlag=false;
 							for(p=0;p<course.getItemCount();p++){
-								if(list2.get(i).get(2).equals(teamName.getItemAt(p))){
+								if(list2.get(i).get(2).equals(course.getItemAt(p))){
 									courseId2=courseId.get(p);
 									courseFlag=true;
 									break;
@@ -592,7 +591,7 @@ public class SCFrame extends JFrame {
 								}
 							}
 							if(p==teacher.getItemCount()) teacherFlag=false;
-							if(dao.query("select * from team_course where teamId='"+teacherId2+"' and teacherId='"+teacherId2+"' and courseId='"+teacherId2+"'", x).size()>0){
+							if(dao.query("select * from team_course where teamId='"+teacherId2+"' and teacherId='"+teacherId2+"' and courseId='"+teacherId2+"' and week='"+list2.get(i).get(3)+"'", x).size()>0){
 								Message message=new Message("该课程已存在！");
 								message.pack();
 							}else if(teacherFlag==false){
@@ -605,7 +604,7 @@ public class SCFrame extends JFrame {
 								Message message=new Message("不存在名为"+list2.get(i).get(2)+"的课程");
 								message.pack();
 							}else{
-								String sql="insert into team_course(teacherId,courseId,teamId,week,start,length,hour) values"
+								String sql="insert into team_course(teacherId,courseId,teamId,week,start,lengths,hour) values"
 										+ "('"+teacherId2+"','"+courseId2+"',"
 												+ "'"+teamId2+"','"+list2.get(i).get(3)+"','"+list2.get(i).get(4)+"','"+list2.get(i).get(5)+"','"+list2.get(i).get(6)+"');";
 								dao.add(sql);
@@ -639,8 +638,8 @@ public class SCFrame extends JFrame {
 		public void update(){
 			DAO dao=new DAO();
 			String[] key={"班级","教师","科目","日期","开始时间","上课长度","课时"};
-			String[] values={"teamName","teacherName","courseName","week","start","length","hour"};
-			list=dao.query("select t1.name teamName,t2.name teacherName,c.name courseName,week,start,length,hour from "
+			String[] values={"teamName","teacherName","courseName","week","start","lengths","hour"};
+			list=dao.query("select t1.name teamName,t2.name teacherName,c.name courseName,week,start,lengths,hour from "
 					+ "team t1,teacher t2,course c,team_course tc where tc.teacherId=t2.id and tc.courseId=c.id and t1.id=tc.teamId", values, key);
 			if(!list.isEmpty()){
 				tableValueV.clear();

@@ -87,7 +87,7 @@ CREATE TABLE team_course(
 	start INT NOT NULL ,
 	lengths INT NOT NULL ,
 	hour INT NOT NULL ,
-	PRIMARY KEY(teamId,teacherId,courseId),
+	PRIMARY KEY(teamId,teacherId,courseId,week),
 	CONSTRAINT tc_teamId FOREIGN KEY(teamId) REFERENCES team(id) ON DELETE CASCADE ,
 	CONSTRAINT tc_teacherId FOREIGN KEY(teacherId) REFERENCES teacher(id) ON UPDATE CASCADE,
 	CONSTRAINT tc_courseId FOREIGN KEY(courseId) REFERENCES course(id)  ON DELETE CASCADE
@@ -98,10 +98,10 @@ CREATE TABLE myfunction(
 	teacherId VARCHAR(36) NOT NULL ,
 	courseId VARCHAR(36) NOT NULL ,
 	teamId VARCHAR(36) NOT NULL,
-	task FLOAT NOT NULL ,
-	pacific FLOAT NOT NULL ,
-	mid FLOAT NOT NULL ,
-	final FLOAT NOT NULL ,
+	task INT NOT NULL ,
+	pacific INT NOT NULL ,
+	mid INT NOT NULL ,
+	final INT NOT NULL ,
 	CONSTRAINT function_teacherId FOREIGN KEY(teacherId) REFERENCES teacher(id) ON DELETE CASCADE ,
 	CONSTRAINT function_courseId FOREIGN KEY(courseId) REFERENCES course(id) ON DELETE CASCADE,
 	CONSTRAINT function_teamId FOREIGN KEY(teamId) REFERENCES team(id) ON DELETE CASCADE
