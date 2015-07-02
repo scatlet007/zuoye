@@ -168,7 +168,10 @@ public class ExcelOpt {
 				//循环读取每一单元格的值
 				for(int j=0;j<ve.get(i).size();j++){
 					//向外写单元格的值
-					ws.addCell(new jxl.write.Label(j,i+1,ve.get(i).get(j).toString()));
+					if(ve.get(i).get(j)==null)
+						ws.addCell(new jxl.write.Label(j,i+1,""));
+					else
+						ws.addCell(new jxl.write.Label(j,i+1,ve.get(i).get(j).toString()));
 				}
 			}
 			wwb.write();

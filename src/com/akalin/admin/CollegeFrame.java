@@ -500,10 +500,10 @@ public class CollegeFrame extends JFrame {
 	   List<List<Object>> list=dao.query("select Max(id) as id from college", x);
 	   if(!list.isEmpty()&&list.get(0).get(0)!=null){
 		   String id=list.get(0).get(0).toString();
-		   String subId=id.substring(7);
-		   return "college"+String.valueOf(Integer.parseInt(subId)+1);
+		   String subId=id.substring(2);
+		   return "00"+String.valueOf(Integer.parseInt(subId)+1);
 	   }else{
-		   return "college1001";
+		   return "005";
 	   }
    }
    protected void button(ActionEvent e){

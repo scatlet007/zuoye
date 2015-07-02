@@ -627,10 +627,10 @@ public class TeacherFrame extends JFrame {
 			   List<List<Object>> list=dao.query("select Max(id) as id from teacher;", x);
 			   if(!list.isEmpty()&&list.get(0).get(0)!=null){
 				   String id=list.get(0).get(0).toString();
-				   String subId=id.substring(7);
-				   return "teacher"+String.valueOf(Integer.parseInt(subId)+1);
+				   String subId=id.substring(0);
+				   return ""+String.valueOf(Integer.parseInt(subId)+1);
 			   }else{
-				   return "teacher1001";
+				   return "3020";
 			   }
 		   }
 		   private void update(){
