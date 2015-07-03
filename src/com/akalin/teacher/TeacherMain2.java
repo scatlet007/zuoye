@@ -291,9 +291,6 @@ public class TeacherMain2 extends JFrame {
 		}
 		tableModel=new DefaultTableModel(tableValueV, columnNameV);
 		table = new JTable(tableModel);
-		table.setColumnSelectionAllowed(true);
-		table.setCellSelectionEnabled(true);
-		table.setEnabled(false);
 		scrollPane.setViewportView(table);
 		
 		JLabel give = new JLabel(">>>>>");
@@ -1020,10 +1017,10 @@ public class TeacherMain2 extends JFrame {
 		   List<List<Object>> list=dao.query("select Max(id) as id from myfunction;", x);
 		   if(!list.isEmpty()&&list.get(0).get(0)!=null){
 			   String id=list.get(0).get(0).toString();
-			   String subId=id.substring(8);
-			   return "function"+String.valueOf(Integer.parseInt(subId)+1);
+			   String subId=id.substring(0);
+			   return ""+String.valueOf(Integer.parseInt(subId)+1);
 		   }else{
-			   return "function1001";
+			   return "8020";
 		   }
 	   }
 	public void initSc(){
